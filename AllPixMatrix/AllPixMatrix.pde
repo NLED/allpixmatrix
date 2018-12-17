@@ -1,4 +1,4 @@
-/* //<>//
+/*
  MIT License
  
  Copyright (c) 2018 Northern Lights Electronic Design, LLC
@@ -25,12 +25,11 @@
  Copyright 2018
  Company: Northern Lights Electronic Design, LLC
  Contact: JNygaard@NLEDShop.com
- Date Updated: June 19, 2018 
- Software Version:  BETA 0.1
+ Date Updated: December 17, 2018 
+ Software Version:  v.1a
  Webpage: www.NLEDShop.com/nledallpixmatrix
- Written in Processing v3.3.7  - www.Processing.org
+ Written in Processing v3.4  - www.Processing.org
  
- THIS SOFTWARE IS IN BETA - PLEASE REPORT BUGS
  
  ======================================================================================================================================
  
@@ -53,6 +52,7 @@ NLED Pixel Controller Mini - Serial
 NLED Pixel Controller Ion - Aurora USB or Serial
 NLED Pixel Controller Electron - Aurora USB or Serial
 More NLED Controllers will be available soon
+Arduino Controllers that are compatible with Glediator
 
 Currently no Arduino library, but should work with any Gleidator compatible sketches. If someone wants to write one, I can link it.
 Previously I have had reports that USB enabled Arduinos may not work with the default USB stack. I think this is because the default USB stack
@@ -62,116 +62,146 @@ Maximum Size matrix: 512x512 - not tested or know if it would actually work. But
 
  ======================================================================================================================================
  
+Changes BETA 0.99 to v.1a
+	- numerous GUI fixes
+	- Star fieild 'twinkle' changed to z-distance
+	- Updated media crop/resize options
+	- Centered matrix preview grids
+	- Numerous fixes to prevent stalls/freezes when loading external data streams
+	- Fixed per layer pausing and feed pausing
+	- Fixed issues with re-loading config files during application runtime
+	- Renamed numerous variables and objects with more refined naming schemes
+	- Added option to record to file for string or binary/raw formated files
+	
+======================================================================================================================================
+	
+Added Notes: ----------------------------------------------------------------------------------------------------
+ 	 
+	 
+	 
 General Notes: ----------------------------------------------------------------------------------------------------
  
- May run terribly on some systems - Optimization is not done yet. Use a good computer.
-   - Tested on a i7-7700K, 32GB RAM, GTX 690 GPU
-       - Uses about 3.2GB of RAM, at about 8% CPU usage
+ May run terribly on some systems - Still needs much more optimization. Use a computer with good CPU.
+   - Tested on a i7-7700K, 32GB RAM, GTX 1070 GPU
+		- uses about 10% CPU, 160MB RAM
  
- Still need to add automatic fading, and automated playlist modes. Among many other small features.
- 
- And need to port to spout to syphon and get Mac version working.
- 
- And lots more, read the below notes for details.
+ Left it on for 3 hours or so - was before the try in movie event - not yet reproducable
+	An error happened with content tile: 4 - was a movie AVI file
+	objects.pde:240:0:240:0: NullPointerException
 
+	
+Known Issues: ----------------------------------------------------------------------------------------------------
+ 
+	- if a USB controller or adapter is disconnected from the PC, the software will not detect it and will continue running normally
+		- this is supposedly an unsolveable issue software side. Java can't detect if the serial port is not receiving on the hardware end
+		- for now unplug the USB serial device, run "Reload Configs" from main menu, plug back in the serial device and run "Reload Configs" again.
+		- If anyone has any input on this, it would be very helpful to get fixed.
+ 
+	- if a media content tile is on both feeds, it can't be paused by the Feed Pause, unless both feeds are paused
+	
+	- can only have one "Data File" media loaded at once, otherwise will use the data file that was last selected
+ 
+	- If a media tile is on multiple feeds or layers, some per layer or per feed settings are applied to all of the refrences
+		- the last one to be placed highest speed over rides, among others such as play modes(play pause)
+ 
+	- Doesn't fully produce a thumbnail of a generated media type until it is added to a layer or otherwise ran for multiple frames
+ 
+    - Need to prevent commas from being used in file paths, since it will jam up the content file loading/saving
+ 
+    - Glediator data or image needs to be rotated clockwise 90 degrees
+ 
+    - If AURORACMD is set but a serial device is connected it may put it out of frame. Pause the output then re-enable to reset.
+ 
+ 
 Mouse and Keyboard Input: ----------------------------------------------------------------------------------------------------
 
-To fill a layer, click the layer preview icon, it will highlight red, then click one of the sourceContentTiles to fill the layer. Right click to cancel the selection.
-Clicking the layer preview icon when selected will open the source content menu if a content is loaded onto the layer. Same as opening it through the source content tile area.
-Right click a layer preview icon to clear the layer.
+	To fill a layer, click the layer preview icon, it will highlight red, then click one of the mediaContentTile to fill the layer. Right click to cancel the selection.
+	Clicking the layer preview icon when selected will open the media content tile menu if a content is loaded onto the layer. Same as opening it through the media content tile area.
+	Right click a layer preview icon to clear the layer.
 
-MouseWheel or the scrollbar over Source Content selection area to the  view the available tiles.
+	MouseWheel or the scrollbar over media content selection area to the view the available tiles.
 
-Use mouse arrow down/up to select drop down items - click the drop down first
-Use mouse arrow left/right to adjust sliders - click the slider first
+	Use mouse arrow down/up to select drop down items - click the drop down first
+	Use mouse arrow left/right to adjust sliders - click the slider first
 
+	
  Usage Notes: ----------------------------------------------------------------------------------------------------
 
- selectInput() when used with P2D or P3D renderer has an open issue, the fix is to minimize the main window while the file dialog is open
- - find issue# so it can be logged and maybe fixed
+ - selectInput() when used with P2D or P3D renderer has an open issue, the fix is to minimize the main window while the file dialog is open
+	- issue is posted on github, maybe fixed someday
  
- All sources stay in PImage or PGraphics buffers until last step
- Don't forget to .get() otherwise PImage = PImage acts as a pointer, ask about it 
+ - All media buffers stay in PImage or PGraphics buffers until last step when the buffered images are converted into raw bytes for transmission
+ - Have to use imageBuffer.get() to copy, otherwise PImage = PImage acts as a pointer, doubt it is suppose to.
  
- Should effects(filter(), contrast, color min/max, tint) be per layer or per source content?
+ - Should effects(filter(), contrast, color min/max, tint) be per layer or per media tile?
  
- Gui element values are only updated never called, global variables and objects should be filled and applied to the elements
+ - Gui element values are only updated never called, global variables and objects should be filled and applied to the elements
     - Getters and setters, no long variable pulling from objects - didn't quite work out like that
  
- Content previews on tiles and layers are not affected by filters and effects
+ - Content previews on tiles and layers are not affected by filters and effects
  
- Software uses the default rxtx files, so no need for a special confusing install
+ - Software uses the default rxtx files, so no need for a special confusing install
  
- Use Java Mission control to try and optimize
+ - Use Java Mission control to try and optimize more
  
- Large Patches for certain slows down the software
- - doesn't matter if serial or USB(serial)
- - RAM usage seemed lower, but why?
- 
+ - Large Patches for certain slows down the software
+	 - doesn't matter if serial or USB(serial)
+
+	 
  Audio Notes: ----------------------------------------------------------------------------------------------------
  
- Requires a 'line in' in order to use sound reactivity.
- 
- Sound reactivity input - future changes
- - map it to various parameters dynamically
- - create multiple Audio value streams with options, then map them to parameters
- - use generated instanceID for selecting audioInputs
- 
- - might be coole to detect the BPM and run actions on beat. Like what? 
- 
- Issues to Deal With Later: ------------------------------------------------------------------------------------------------------------
- 
- - Remote control - midi or whatever
- 
- - need to prevent commas from being used, since it will jam up the content file loading/saving
- 
- - Glediator data or image needs to be rotated clockwise 90 degrees - no idea how to calculate that
- 
- - Feed play/pause doesnt effect movies, but layer pausing does
- 
- - If AURORACMD is set but a serial device is connected it may put it out of frame. Pause the output then re-enable to reset.
- 
+ - Requires a 'line in' in order to use sound reactivity - using generated media sources.
+ - Might be cool to detect the BPM and run actions on beat. Like what actions? 
+ - Sound reactivity input - future changes
+	 - map it to various parameters dynamically
+	 - create multiple Audio value streams with options, then map them to parameters
+	 - use generated instanceID for selecting audioInputs
+	 
+
  GUI Notes: --------------------------------------------------------------------------------------------
  
  - Fully scalable GUI in 16:9 resolution - native is 1366 x 768
  - Fully resizable window, uses scale() feature, requires mouseX and mouseY to be converted to mouseXS and mouseYS 
-   - All the drawing is static sized, the scale() function scales it accordingly.
+ - All the drawing is static sized, the scale() function scales it accordingly.
  - GUI elements are meant to be large to make it more touchscreen compatible. 
+ 
  
  Frame Rates: --------------------------------------------------------------------------------------------
  
  - Software runs at whatever FPS, only used to update the GUI and previews - using software.frameRateMs - default to 30 FPS
  - Transmission output is based on when newly updated data is available for transmission. Sent once flag is set.
  - Content has a FPS and layers have an FPS. When content is loaded to a layer it sets the layers FPS.
- - The layer FPS can be adjusted on the fly and does not affect the source content FPS.
+ - The layer FPS can be adjusted on the fly and does not affect the media source FPS.
  
- Renders: ---------------------------------------------------------------------------------------------
+ 
+ Processing Renders: ---------------------------------------------------------------------------------------------
  
  https://forum.processing.org/two/discussion/14874/p2d-now-slow-even-on-an-empty-sketch-wasn-t-so-slow-before
  
- - Default works well. No syphon support, 3D generated won't work at all. Other generated issues.
- - P2D is required for syphon/spout, but has lag problems that get worse over time
+ - Default renderer works well. No syphon support, 3D generated won't work at all. Other generated issues.
+ - P2D is required for syphon/spout, but has lag problems
  - problem was size() P2D with P2D scratch and mixing PGraphics buffers.
- - P3D works well, but all strokes overlay the window.
+ - P3D works well, but all strokes overlay everything else that is drawn.
  - hint(DISABLE_OPTIMIZED_STROKE); makes strokes display correctly.
+ 
  
  Overlay Menus: ---------------------------------------------------------------------------------------------
  
- - Effects: generated per 
- - Color Chooser: no library one, have to make my own
- - sourceContent loading - not all use a file chooser, some need defines(glediator input COM port & baud)
- Options Menu:
-    not sure what to put there yet - its empty
+ - Effects: generated per layer.
+ - Color Chooser: no library one, uses custom one with alpha/transparency options. All 8-bit colors.
+ - Media Tile Loading: not all use GUI menu, some need ini defines(glediator input COM port & baud).
+ - Options Menu: not yet populated, not sure what will go there.
  
- Generated: ---------------------------------------------------------------------------------------------
+ 
+ Generated Media: ---------------------------------------------------------------------------------------------
  
  - Each type of generated content is an object with parameters and methods. Allowing multiple of the same type to run at the same time, with independant parameters.
- - Parameters are saved and restored.
- - When selecting a generated it scans and either finds an empty slot or adds another object.
- - When changed to another generated type or similar, it disposes the generated object.
+ - Parameters are saved and restored with the content save(.allpix) files.
+ - When selecting a generated media type it scans and either finds an empty slot or adds another object. Variable is instanceID, the cMaxGeneratedObjects is the maximum instances.
+ - When changed to another generated media type or similar, it disposes the previous generated object, loosing any settings.
  - Generated content does not support negative framerates, which indicates 'play in reverse'. It could be done, but some generated types have parameters that reverse it's function
- 
  - DecayBuffer() not working that well with transparency. Think it is a bit strange, but fine for now.
+ 
  
  "Star Field" 
  - starts with too many stars.
@@ -192,10 +222,12 @@ Use mouse arrow left/right to adjust sliders - click the slider first
  "3D Shape" - only one shape, that is box()/cube
  "Sine Wave" - either audio sines, or generated sine
  "Dancing Bars" - either audio or random based
+ "Template" - empty generated type with a few elements for adding new media generation routines
+ 
  
  Effects & Filters: ---------------------------------------------------------------------------------------------
  
- - Uses the built in filter() function with a paramater
+ - Uses the built in processing function filter() with a paramater
  
  Additional Stand-Alone Effects:
  - Minimum/Contrast - actual contrast is complicated - this just sets the minimum a color value can be. If contrast is 40, and red is 38, red = 0. Makes 'muddy' colors more vibrant
@@ -204,53 +236,57 @@ Use mouse arrow left/right to adjust sliders - click the slider first
  - Color Tint - overlays a color on top of the layer. Use transparency/alpha for best results
  - Add brightness maybe in the future
  
+
  Effects: 
  - Want things like mirror, kaleidescope, what else?
+ 
  
  Blending: ---------------------------------------------------------------------------------------------
  
  - Figure out blending modes, why some allow transparency variation and some don't - doesn't make sense
      - gotta be how alpha channel is being used, when it writes to PGraphics it maintains alpha, 
- - add minim and maxim blend modes like NLED Matrix, they work well for this usage
+ - Add minim and maxim blend modes for main mixing like NLED Matrix, they work well for this usage
  
- We recommend using blendMode() and not the previous blend() function. However, unlike blend(), 
- the blendMode() function does not support the following: HARD_LIGHT, SOFT_LIGHT, OVERLAY, DODGE, BURN. On older hardware, 
- the LIGHTEST, DARKEST, and DIFFERENCE modes might not be available as well.
+ From Processing docs:
+	 We recommend using blendMode() and not the previous blend() function. However, unlike blend(), 
+	 the blendMode() function does not support the following: HARD_LIGHT, SOFT_LIGHT, OVERLAY, DODGE, BURN. On older hardware, 
+	 the LIGHTEST, DARKEST, and DIFFERENCE modes might not be available as well.
+	 
+	 
+ Media Content Resolution Notes: ---------------------------------------------------------------------------------------------
  
- Content Resolution Notes: ---------------------------------------------------------------------------------------------
+ - Can use any sized media content, but it must be cropped or shrunk if over-sized
+ - The function uses X,Y offsets and width and height of crop.
+ - Can be scaled to X&Y which ignores porportions, scaled to W or to H which may leave black space or crop off content
+ - Generated content is always at a native matrix size, same for external data content. Is never scaled by matrix size, only the settings.
  
- - can use any sized content, but it must be cropped or shrunk if over-sized
- - the function uses X,Y offsets and width and height of crop, applied at mixing time.
- - can be scaled to X&Y which ignores porportions, scaled to W or to H which may leave black space or crop off content
- - generated content is always at a natural size, same for external data content
  
  Spout/Syphon Notes:  ---------------------------------------------------------------------------------------------
  
- Spout IDs will be different every time the software loads, due to they are IDed based on what? when the order the transmitters are started?
- NEVER SELECT THE SPOUT SENDER INSIDE SOFTWARE
- can not pull the width and height, have to grab them at source loading
+ - Spout IDs will be different every time the software loads, due to they are IDed based on what? when the order the transmitters are started?
+ - NEVER SELECT THE SPOUT SENDER INSIDE SOFTWARE
+ - Can not pull the width and height, have to grab them at source loading
+ - Spout feed was cropw and croph of 1, so only one pixel showed.. was from mildrop - was because no spout feeds were available at software start up
  
- Spout feed was cropw and croph of 1, so only one pixel showed.. was from mildrop
- - was because no spout feeds were available at software start up
  
  Future Updates: ---------------------------------------------------------------------------------------------
  
-  lock or notify if content is assigned to a layer if when the menu is open
+ - Media tiles need to be updated to hold layer sets. So a single selection of a media tile will load multiple layers with media.
+ - Remote control - midi or OSC or whatever
+ - Still need to add automatic fading, and automated playlist modes. Among many other small features. Will be a automated mixing routine.
+ - Thread off automatic mode once written
+ - And need to port to spout to syphon and get Mac version working.
+ - Lock or notify if media content is assigned to a layer if when the menu is open. Since certain per layer features are applied to the media tile
+ - Get rid of tile buttons, use just the object - define an area, add an over() - Maybe merge all the element mousedPressed like display() 
+ - Add option to preview matrix as circles rather than squares
+ - Add dithering/gamma correction as last step
+ - For cropping media content in the media tile menu, drag the handles to adjust
+ - Keep image and video IDs, but make them load from a single button/GUI elements, its easier, then check extension for validity and image vs video - forget it
+ - Type face or font selection for generated media text type
+ - Rolling backup content file saving	
  
-  Get rid of tile buttons, use just the object - define an area, add an over()
-   - maybe merge all the element mousedPressed like display()
-   
- Add option to preview matrix as circles rather than squares
  
- Add dithering/gamma correction as last step
- 
- Thread off automatic mode once written
- 
- For cropping content, drag the handles to adjust
- 
- Keep image and video IDs, but make them load from a single button/GUI elements, its easier, then check extension for validity and image vs video - forget it
- 
- Links: ---------------------------------------------------------------------------------------------
+ Relevant Links: ---------------------------------------------------------------------------------------------
  
  https://github.com/leadedge/SpoutProcessing/blob/master/src/spout/Spout.java#L97
 
@@ -281,14 +317,16 @@ import java.io.FileWriter; //required for file recording mode
 //Midi for external control
 //add later
 
-//============ Software Constants ================
+//============================ Software Constants ================================
 
 final int cSoftwareVersion = 0;
 final int cSoftwareRevision = 0;
 
-final int cSoftwareMaxContentSources = 64; //128 later
+final int cSoftwareMaxMediaTiles = 65; //128 later
 final int cSoftwareMaxSpout = 8; 
 final int cSoftwareMaxLayers = 3;
+final int cSoftwareMaxViewedTiles = 15;
+
 
 final int cMaxGeneratedObjects = 8;
 
@@ -310,7 +348,7 @@ final int cDefaultOutputFPS = 30;
 final int cBackgroundColor = color(65, 65, 65); // have to update all Handlestatus so can remove
 
 //Overlay Menu IDs
-final int cOverlaySourceContent = 1; //menu IDs
+final int cOverlayMediaTileMenu = 1; //menu IDs
 final int cOverlayEffectsMenu = 2;
 final int cOverlayMainMenu = 3;
 
@@ -329,12 +367,14 @@ final int cMousePressHoldAdjustmentTime = 100;
 
 final String cFileSep = ","; //used for file saving
 
-//============ Application Constants ================
+//============================ Application Constants ================================
 
-final String cDDStrListBlendModes[] = {"Blend", "Add", "Subtract", "Darkest*", "Lightest*", "Difference", "Exclusion", "Multiply*", "Screen*", "Replace*"};
+final String cDDStrListBlendModes[] = {"Blend", "Add", "Subtract", "Darkest*", "Lightest", "Difference", "Exclusion", "Multiply", "Screen", "Replace"};
 final int cBlendID[] = {BLEND, ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, REPLACE}; //needed to call blendMode(variable)
 
 final String cScaleOptionsDDStr[] = {"Native/None", "Scale W & H", "Scale To W", "Scale To H"};
+
+final String cColorOrderStr[] = {"RGB", "BRG", "GBR", "RBG", "BGR", "GRB"};
 
 final String cDDStrListFilterModes[] = {"NONE", "THRESHOLD", "GRAY", "OPAQUE", "INVERT", "POSTERIZE", "BLUR", "ERODE", "DILATE"};
 final int cFilterIDStr[] = {9999, THRESHOLD, GRAY, OPAQUE, INVERT, POSTERIZE, BLUR, ERODE, DILATE};
@@ -355,7 +395,7 @@ final String cDDGeneratedAudioModes[] = {"Random", "Audio In"};
 //========================================= Variables ==================================================
 
 //Graphics buffers
-PGraphics SourceContentGBufA, SourceContentGBufB, MixedContentGBuf; //final location of the mixed layers
+PGraphics LayerContentGBufA, LayerContentGBufB, MixedContentGBuf; //final location of the mixed layers
 PGraphics scratchGBuf; //used for generated content
 
 PImage transmitPixelBuffer, feedPreviewImgA, feedPreviewImgB;
@@ -386,9 +426,11 @@ boolean mixFeeds = false;
 int holdMillis = millis();
 
 int displayPixSize = 10; //start at default, recalculated to new size when patch file is loaded
+int displayOffsetX = 0;
+int displayOffsetY = 0;
 
-int PrevHeight = 0;//height;  //used to monitor if the grid window's size is changed
-int PrevWidth = 0;//width;
+int PrevHeight = 0;  //used to monitor if the grid window's size is changed
+int PrevWidth = 0;
 
 //Software variables
 float CrossFaderValue = 0.5;
@@ -400,7 +442,7 @@ int MainBlendMode = 0;
 int FeedPlayModeA = 0; //0 = play, 1 = pause
 int FeedPlayModeB = 0; //0 = play, 1 = pause
 
-int DefinedContentSources = -1; //keeps track of how many sourceContentTiles are populated with content
+int DefinedMediaTiles = 0; //keeps track of how many mediaContentTiles are populated with content
 int workingTileID = 0;
 int holdLayerID = 0;
 
@@ -418,13 +460,13 @@ boolean PrintDebugMessages = false;
 boolean AudioInputEnabled = false;
 
 String SelectedFilePath = ""; //holds file paths
-int FileBrowserAction = 0; //holds the ID for the file selection dialog callback
 
 //Data Transmission Variables
 boolean PacketReadyForTransmit = false;
 byte[] TransmissionArray = new byte[1]; //packs the data to be sent out into here, it sends it faster if they are bytes
 
 String RecorderFileName = "";
+int FileRecorderFormat = 0; //USER MUST CHANGE THIS, fill find a GUI method later: 0 = NLED String format, 1 = raw byte format
 
 //Globals for the external data protocol - such as glediator
 short[] ExternalDataArray = new short[1]; 
@@ -432,16 +474,14 @@ int ExternalDataCounter = 0;
 int ExternalDataHoldMillis = 0;
 int ExternalDataMillis = 0;
 boolean ExternalDataFramed = false;
-boolean ExternalDataRunning = false;
 
 int[] FilePlayDataBuffer = new int[1]; 
 String[] FilePlayStrLines;
 int FilePlayDataCount = 0;
 
-
 //=================================================================================================================================
 
-// DECLARE A SPOUT OBJECT
+//DECLARE A SPOUT OBJECT
 Spout[] spoutReciever;
 Spout spoutSenderMixed, spoutSenderA, spoutSenderB;
 
@@ -471,18 +511,18 @@ guiNumberInputField numberInputFieldPtr;
 guiColorSquare colorSquarePtr;
 guiContentLayer contentLayerPtr;
 
-SourceContentTile[]  sourceConentTile;
+mediaContentObj[]  mediaContentTile;
 
 //One per side
 guiContentLayer[] contentLayerA, contentLayerB;
-guiButton[] layerAtileButtons, layerBtileButtons;
-guiButton[] layerAeffectButtons, layerBeffectButtons;
-guiButton[] layerAsourceOptionButtons, layerBsourceOptionButtons;
-guiSliderBar[] layerOpacitySlidersA, layerOpacitySlidersB;
+guiButton[] feedLayersTileButtonsA, feedLayersTileButtonsB;
+guiButton[] feedLayersEffectsButtonsA, feedLayersEffectsButtonsB;
+guiButton[] feedLayersOptionsButtonsA, feedLayersOptionsButtonsB;
+guiSliderBar[] feedLayersOpacitySliderA, feedLayersOpacitySliderB;
 guiButton[] feedLayersPlayPauseA, feedLayersPlayPauseB;
-guiNumberInputField[] layerASpeedNIF, layerBSpeedNIF;
+guiNumberInputField[] feedLayersSpeedNIFA, feedLayersSpeedNIFB;
 
-guiDropDown[] layerAblendModeDD, layerBblendModeDD;
+guiDropDown[] feedLayersBlendModeDDA, feedLayersBlendModeDDB;
 
 guiSliderBar mainCrossFader, mainIntensityFader, intensitySliderA, intensitySliderB;
 
@@ -490,14 +530,14 @@ guiButton crossHardCutA, crossHardCutB, crossAutoA, crossAutoB;
 guiButton feedPlayPauseA, feedPlayPauseB;
 guiButton reloadConfigFilesButton, loadContentFileButton, saveContentFileButton, openMainMenuButton, recordToFileButton;
 
-guiDropDown mainBlendModeDD, generatedSourceContentDD, effectsOptionsDD, imgScalingOptionsDD;
+guiDropDown mainBlendModeDD, generatedMediaDD, effectsOptionsDD, imgScalingOptionsDD;
 
-guiNumberInputField generatedSourceContentFPS;
+guiNumberInputField generatedMediaFPS;
 
 guiButton[] playControlsA, playControlsB; //covers play/pause and stop buttons
 
-guiSliderBar sourceContentScrollBar;
-guiButton[] contentSelectionButtons;
+guiSliderBar mediaContentScrollBar;
+guiButton[] mediaTileSelectionButtons;
 guiButton[] loadContentButtons;
 
 OverlayMenu[] guiOverlayMenus;
@@ -508,7 +548,7 @@ guiSliderBar menuColorSelSliderRed, menuColorSelSliderGreen, menuColorSelSliderB
 
 guiButton menuCloseButton, menuColorSelClose;
 
-guiButton[] menuSourceConentButtons;
+guiButton[] menuMediaTileMenuButtons;
 
 guiNumberInputField effectsFilterInputField, effectContrastNIF;
 guiColorSquare effectsTintColor;
@@ -517,7 +557,7 @@ guiNumberInputField effectMaxColorNIFRed, effectMaxColorNIFGreen, effectMaxColor
 guiSliderBar effectMinColorSliderRed, effectMinColorSliderGreen, effectMinColorSliderBlue;
 guiSliderBar effectMaxColorSliderRed, effectMaxColorSliderGreen, effectMaxColorSliderBlue;
 
-guiNumberInputField contentOffsetX, contentOffsetY, contentGUICropW, contentGUICropH;
+guiNumberInputField contentOffsetX, contentOffsetY, mediaMenuGUICropW, mediaMenuGUICropH;
 
 //Generated Content Classes
 generatedText[] genContentText;
@@ -543,7 +583,7 @@ guiColorSquare genTextColor, genTextBackgroundColor;
 
 guiDropDown genStarsShapeDD;
 guiNumberInputField genStarsSizeNIF, genStarsStrokeNIF, genStarsQuantityNIF, genStarsDecayNIF;
-guiCheckBox genStarsTwinkleEnable;
+guiCheckBox genStarsZDistEnable;
 guiColorSquare genStarsFillColor, genStarsStrokeColor;
 
 guiDropDown genFallingBlocksDirection;
@@ -591,8 +631,8 @@ guiCheckBox genTemplateEnableSmoothing;
 
 //================================== ArrayList for GUI MouseOver Elements ====================================================
 
-//ArrayList<SourceContentTile> SourceContentTileList; //makes list to make it easier to mouseover
-//SourceContentTile ContentTilePtr;
+//ArrayList<mediaContentObj> mediaContentObjList; //makes list to make it easier to mouseover
+//mediaContentObj ContentTilePtr;
 
 ArrayList<guiButton> ButtonList; //makes list to make it easier to mouseover
 guiButton PointerButton;
@@ -611,7 +651,6 @@ PFont font, generatedFont;
 
 //========================= END OBJECT DECLARTION ==============================
 //========================= START SETUP FUNCTION ==============================
-
 
 void settings() 
 {
@@ -640,21 +679,23 @@ void setup() {
   colorMode(RGB);
   frameRate(1000); //set to 1000, to make draw run every 1 millisecond
 
-  //textFont( loadFont("Gisha-Bold-32.vlw"), 24);
   font = createFont("Arial-BoldMT", 48);
-  //font = loadFont("Arial-BoldMT-48-smooth.vlw");
-  generatedFont = loadFont("Arial-BoldMT-48.vlw");
+  generatedFont = loadFont("Arial-BoldMT-48.vlw"); //for use with the text generated media, edit with your own if you want
   textFont(font);
   gui = new GUIObj(); //init graphic user interface from XML file or something
 
   software = new SoftwareObj(); //not doing anything yet - except enableMouseOver
 
   //---------------------- End Software Setup ---------------------------------------------
+  
+  //was not able to get patch changes working mid program, restart software if you need to change the patch file for now
+  //have to resize all the image buffers (LayerContentGBufA, scratchImg etc) but that will cause crashes since it will be accessed by threads before fully updated
 
-  matrix = new MatrixObj();
-  LoadConfigurationFiles(); //Load all configuration files  
-  matrix.LoadPatchFile();
+    matrix = new MatrixObj(); 
+  LoadConfigurationFiles(); //Load all configuration files , patch files, and the rest - does not load media content files
 
+  matrix.loadPatchFile();
+  
   println("Matrix Object built, Width: "+matrix.width+"   Height: "+matrix.height);
   println("Using patch file: "+matrix.patchFileName);
 
@@ -683,75 +724,75 @@ void setup() {
   spoutReciever = new Spout[cSoftwareMaxSpout];
   // for ( int i = 0; i < cSoftwareMaxSpout; i++) spoutReciever[i] = new Spout(this);
 
-  movieFile = new Movie[cSoftwareMaxContentSources]; //not sure how else to do it, maybe assign IDs like with spout or generated content
+  movieFile = new Movie[cSoftwareMaxMediaTiles]; //not sure how else to do it, maybe assign IDs like with spout or generated content
 
-  SourceContentGBufA =  createGraphics(matrix.width, matrix.height);
-  SourceContentGBufB =  createGraphics(matrix.width, matrix.height);
+  LayerContentGBufA =  createGraphics(matrix.width, matrix.height);
+  LayerContentGBufB =  createGraphics(matrix.width, matrix.height);
   MixedContentGBuf =  createGraphics(matrix.width, matrix.height);
 
   scratchGBuf = createGraphics(matrix.width, matrix.height);
   scratchImg = createImage(matrix.width, matrix.height, ARGB);
 
-  //====================== Init Images ======================
+  //--------------------------------------------- Init Images ---------------------------------------------
 
   imgMixerHandleHoriz = loadImage("mixerhandle-horiz.png");  
   imgSliderBarHoriz = loadImage("sliderbg-horiz.png");
   imgSliderBarVert = loadImage("sliderbg-vert.png");
   imgMixerHandleVert = loadImage("mixerhandle-vert.png");  
   
-  //==================== Init ArrayList for objects ======================
+  //--------------------------------------------- Init ArrayList for objects ---------------------------------------------
 
-  //SourceContentTileList = new ArrayList<SourceContentTile>();  
+  //mediaContentObjList = new ArrayList<mediaContentObj>();  
   ButtonList = new ArrayList<guiButton>();  
   DropDownList = new ArrayList<guiDropDown>();  
   TextFieldList = new ArrayList<guiTextField>();  
   CheckBoxList = new ArrayList<guiCheckBox>();  
 
-  //====================== Init General Objects ==========================
+  //--------------------------------------------- Init General Objects ---------------------------------------------
 
 
 
-  //=======================  Init GUI Element Objects  ==========================
+  //---------------------------------------------  Init GUI Element Objects  ---------------------------------------------
 
-  contentSelectionButtons = new guiButton[15]; //based on window width, since that affects bottom scroll area
-  for (int i=0; i != contentSelectionButtons.length; i++) contentSelectionButtons[i] = new guiButton("+", 10+(i*90), 655, 80, 80, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, false); 
+  mediaTileSelectionButtons = new guiButton[cSoftwareMaxViewedTiles]; //based on window width, since that affects bottom scroll area
+  for (int i=0; i != mediaTileSelectionButtons.length; i++) mediaTileSelectionButtons[i] = new guiButton("+", 10+(i*90), 655, 80, 80, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, false); 
 
-  //this creates some source conent tiles
-  sourceConentTile  = new SourceContentTile[cSoftwareMaxContentSources];
-  sourceConentTile[0] = new SourceContentTile("NULL", 0); //init null object, prevents nullpointer errors and offers an 'empty' source  content
+  //this creates some media conent tiles
+  mediaContentTile  = new mediaContentObj[cSoftwareMaxMediaTiles];
+  mediaContentTile[0] = new mediaContentObj("NULL", 0); //init null object, prevents nullpointer errors and offers an 'empty' source  content
 
-  //================ Define layer elements ==============================
+  //--------------------------------------------- Define layer elements ---------------------------------------------
 
-  layerAtileButtons = new guiButton[cSoftwareMaxLayers];
-  layerAeffectButtons = new guiButton[cSoftwareMaxLayers];
-  layerAsourceOptionButtons = new guiButton[cSoftwareMaxLayers];
+  feedLayersTileButtonsA = new guiButton[cSoftwareMaxLayers];
+  feedLayersEffectsButtonsA = new guiButton[cSoftwareMaxLayers];
+  feedLayersOptionsButtonsA = new guiButton[cSoftwareMaxLayers];
   feedLayersPlayPauseA = new guiButton[cSoftwareMaxLayers];
-  layerOpacitySlidersA = new guiSliderBar[cSoftwareMaxLayers];
-  layerAblendModeDD = new guiDropDown[cSoftwareMaxLayers];
-  layerASpeedNIF = new guiNumberInputField[cSoftwareMaxLayers];
+  feedLayersOpacitySliderA = new guiSliderBar[cSoftwareMaxLayers];
+  feedLayersBlendModeDDA = new guiDropDown[cSoftwareMaxLayers];
+  feedLayersSpeedNIFA = new guiNumberInputField[cSoftwareMaxLayers];
 
   contentLayerA = new guiContentLayer[cSoftwareMaxLayers];
   for (int i=0; i != contentLayerA.length; i++) contentLayerA[i] = new guiContentLayer(i, 0);
 
-  layerBtileButtons = new guiButton[cSoftwareMaxLayers];
-  layerBeffectButtons = new guiButton[cSoftwareMaxLayers];
-  layerBsourceOptionButtons = new guiButton[cSoftwareMaxLayers];
+  feedLayersTileButtonsB = new guiButton[cSoftwareMaxLayers];
+  feedLayersEffectsButtonsB = new guiButton[cSoftwareMaxLayers];
+  feedLayersOptionsButtonsB = new guiButton[cSoftwareMaxLayers];
   feedLayersPlayPauseB = new guiButton[cSoftwareMaxLayers];
-  layerOpacitySlidersB = new guiSliderBar[cSoftwareMaxLayers];
-  layerBblendModeDD = new guiDropDown[cSoftwareMaxLayers];
-  layerBSpeedNIF = new guiNumberInputField[cSoftwareMaxLayers]; 
+  feedLayersOpacitySliderB = new guiSliderBar[cSoftwareMaxLayers];
+  feedLayersBlendModeDDB = new guiDropDown[cSoftwareMaxLayers];
+  feedLayersSpeedNIFB = new guiNumberInputField[cSoftwareMaxLayers]; 
 
   contentLayerB = new guiContentLayer[cSoftwareMaxLayers];
   for (int i=0; i != contentLayerB.length; i++) contentLayerB[i] = new guiContentLayer(i, 1);
 
-  //--------------------------------------------------------- END LAYER Elements ---------------------------------------
+  //---------------------------------------- END LAYER Elements ---------------------------------------
 
   mainCrossFader = new guiSliderBar(543, 280, 250, 40, 50, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, false, false, true, "mainCrossFaderFunc"); 
   mainIntensityFader = new guiSliderBar(543, 380, 250, 20, 100, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, false, false, true, "mainIntensityFunc"); 
   mainIntensityFader.setValue(int(mainIntensityFader.max*MasterIntensity));
   intensitySliderA  = new guiSliderBar(340, 310, 25, 220, 0, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, true, true, true, "feedIntensityFuncA"); 
   intensitySliderB  = new guiSliderBar(1000, 310, 25, 220, 0, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, true, true, true, "feedIntensityFuncB"); 
-  sourceContentScrollBar = new guiSliderBar(0, 740, 1366, 28, 0, 0, cSoftwareMaxContentSources, color(255), color(0), color(255, 0, 0), color(0), true, false, true, false, "sourceContentSliderFunc"); 
+  mediaContentScrollBar = new guiSliderBar(0, 740, 1366, 28, 0, 0, cSoftwareMaxMediaTiles, color(255), color(0), color(255, 0, 0), color(0), true, false, true, false, "mediaContentSliderFunc"); 
 
   crossHardCutA = new guiButton("A", 480, 280, 40, 40, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
   crossHardCutB = new guiButton("B", 815, 280, 40, 40, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
@@ -762,23 +803,24 @@ void setup() {
   feedPlayPauseB = new guiButton("► ‖", 990, 270, 35, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
 
   mainBlendModeDD = new guiDropDown(cDDStrListBlendModes, 0, 628, 340, 110, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, "mainBlendModeFunc");
-  generatedSourceContentDD = new guiDropDown(cDDStrListGeneratedTypes, 0, 628, 340, 150, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, "generatedSourceContentDDFunc");
+  generatedMediaDD = new guiDropDown(cDDStrListGeneratedTypes, 0, 628, 340, 150, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, "generatedMediaDDFunc");
   effectsOptionsDD  = new guiDropDown(cDDStrListFilterModes, 0, 628, 340, 130, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, "effectsOptionsDDFunc");
   imgScalingOptionsDD = new guiDropDown(cScaleOptionsDDStr, 0, 628, 340, 130, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, "scaleOptionsDDFunc");
 
-  contentOffsetX = new guiNumberInputField(0, 0, 25, 60, 0, 10000, 1, "contentOffsetXFieldFunc");
-  contentOffsetY = new guiNumberInputField(0, 0, 25, 60, 0, 10000, 1, "contentOffsetYFieldFunc");
-  contentGUICropW = new guiNumberInputField(0, 0, 25, 60, 1, 10000, 1, "contentCropWFunc");
-  contentGUICropH = new guiNumberInputField(0, 0, 25, 60, 1, 10000, 1, "contentCropHFunc");
+  contentOffsetX = new guiNumberInputField(0, 0, 25, 60, 0, 10000, 1, "mediaOffsetXFieldFunc");
+  contentOffsetY = new guiNumberInputField(0, 0, 25, 60, 0, 10000, 1, "mediaOffsetYFieldFunc");
+  mediaMenuGUICropW = new guiNumberInputField(0, 0, 25, 60, 1, 10000, 1, "mediaCropWFunc");
+  mediaMenuGUICropH = new guiNumberInputField(0, 0, 25, 60, 1, 10000, 1, "mediaCropHFunc");
 
   effectsFilterInputField = new guiNumberInputField(0, 0, 30, 60, 0, 1, 3, "effectsFilterInputFieldFunc"); //floats 
-  generatedSourceContentFPS = new guiNumberInputField(0, 0, 30, 60, 1, 600, 1, "generatedSourceContentFPSFunc"); //numbers
+  generatedMediaFPS = new guiNumberInputField(0, 0, 30, 60, 1, 600, 1, "generatedMediaFPSFunc"); //numbers
 
   openMainMenuButton = new guiButton("Open Menu", 890, 575, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
   recordToFileButton = new guiButton("Record to File", 890, 540, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true);
-  reloadConfigFilesButton = new guiButton("Reload Configs", 900, 575, 120, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
-  loadContentFileButton = new guiButton("Load File", 600, 575, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
-  saveContentFileButton  = new guiButton("Save File", 740, 575, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
+  
+  reloadConfigFilesButton = new guiButton("Reload Configs", 0, 0, 120, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
+  loadContentFileButton = new guiButton("Load File", 0, 0, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
+  saveContentFileButton  = new guiButton("Save File", 0, 0, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
 
   effectContrastNIF  = new guiNumberInputField(0, 0, 30, 60, 0, 255, 1, "effectContrastFunc");
 
@@ -798,16 +840,15 @@ void setup() {
   effectMaxColorSliderGreen = new guiSliderBar(0, 740, 160, 20, 255, 0, 255, color(160), color(100), color(0, 255, 0), color(0), true, false, false, false, "effectMaxColorSliderGFunc"); 
   effectMaxColorSliderBlue = new guiSliderBar(0, 740, 160, 20, 255, 0, 255, color(160), color(100), color(0, 0, 255), color(0), true, false, false, false, "effectMaxColorSliderBFunc"); 
 
-  //=====================  START OVERLAY MENUS =========================================
+  //---------------------------------------------  START OVERLAY MENUS ---------------------------------------
 
   guiOverlayMenus = new OverlayMenu[8];
   guiOverlayMenus[0] = new OverlayMenu(0, 0, 0, 0, 0); //null Menu
-  guiOverlayMenus[1] = new OverlayMenu(1, 10, 40, 800, 600); //source content selection
-  guiOverlayMenus[2] = new OverlayMenu(2, 10, 40, 800, 550); //layer effects menu
+  guiOverlayMenus[1] = new OverlayMenu(cOverlayMediaTileMenu, 10, 40, 800, 600); //media content selection
+  guiOverlayMenus[2] = new OverlayMenu(cOverlayEffectsMenu, 10, 40, 800, 550); //layer effects menu
   guiOverlayMenus[3] = new OverlayMenu(cOverlayMainMenu, 10, 40, 400, 500); //main menu
 
-
-  //=====================  START Color Selector MENU =========================================
+  //---------------------------------------------  START Color Selector MENU ---------------------------------------
 
   guiColorSelectorMenu = new guiColorSelector(400, 425);
   imgColorSelector = loadImage("colorpickerimg.png");
@@ -827,7 +868,7 @@ void setup() {
   menuColorSelSliderWhite.status = 1;  //grey out, not yet used for anything
   menuColorSelSliderAlpha = new guiSliderBar(0, 740, 160, 20, 255, 0, 255, color(160), color(100), color(0, 0, 0), color(0), true, false, false, false, "colorSelectorSliderAlpha"); 
 
-  //=====================  START OVERLAY MENU GUI ELEMENTS =========================================
+  //---------------------------------------------  START OVERLAY MENU GUI ELEMENTS ---------------------------------------
 
   genTextLabel = new guiTextField("Your Text", 0, 050, 300, 25, gui.textFieldBG, gui.textFieldHighlight, 0, 1, 512, true, false, "generatedContentTextLabelFunc"); //any text
   genNIFTextSize = new guiNumberInputField(0, 0, 30, 60, 8, 1000, 1, "generatedContentTextSizeFunc"); //number only
@@ -846,7 +887,7 @@ void setup() {
   genStarsSizeNIF = new guiNumberInputField(0, 0, 30, 60, 0, 100, 1, "generatedContentStarsShapeFuncSizeFunc"); //number only
   genStarsQuantityNIF = new guiNumberInputField(0, 0, 30, 60, 1, 1000, 1, "generatedContentStarsQuantityFunc"); //number only
   genStarsDecayNIF = new guiNumberInputField(0, 0, 30, 60, 0, 1, 3, "generatedContentStarsDecayFunc"); //float only
-  genStarsTwinkleEnable = new guiCheckBox(0, 0, 25, color(255), color(0), color(0), false, "generatedContentStarsTwinkleFunc");
+  genStarsZDistEnable = new guiCheckBox(0, 0, 25, color(255), color(0), color(0), false, "generatedContentStarsZDistFunc");
   genStarsFillColor = new guiColorSquare(0, 0, 30, "generatedContentStarsColorFunc");
   genStarsStrokeColor = new guiColorSquare(0, 0, 30, "generatedContentStarsStrokeColorFunc");
 
@@ -923,21 +964,21 @@ void setup() {
   genTemplateSize = new guiNumberInputField(0, 0, 30, 60, 1, 1000, 1, "generatedContentTemplateSizeFunc"); //number only
   genTemplateEnableSmoothing= new guiCheckBox(0, 0, 25, color(255), color(0), color(0), false, "generatedContentTemplateSmoothingFunc"); 
 
-  //=====================  START OVERLAY MENU GUI ELEMENTS   =========================================
+  //---------------------------------------------  START OVERLAY MENU GUI ELEMENTS   ---------------------------------------
 
   menuCloseButton  = new guiButton("Close", 0, 0, 80, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true); //common to all/most menus 
 
   //0=NULL, 1=Video File(AVI, MOV, etc), 2=Animated GIF, 3=Static Image, 4=Syphon/Spout, 10=glediator data stream
-  menuSourceConentButtons = new guiButton[7];
-  menuSourceConentButtons[0] = new guiButton("Video File", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
-  menuSourceConentButtons[1] = new guiButton("Animated GIF", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
-  menuSourceConentButtons[2] = new guiButton("Image File", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
-  menuSourceConentButtons[3] = new guiButton("Spout/Syphon", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
-  menuSourceConentButtons[4] = new guiButton("Generated", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
-  menuSourceConentButtons[5] = new guiButton("Data File", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
-  menuSourceConentButtons[6] = new guiButton("External Data", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
+  menuMediaTileMenuButtons = new guiButton[7];
+  menuMediaTileMenuButtons[0] = new guiButton("Video File", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
+  menuMediaTileMenuButtons[1] = new guiButton("Animated GIF", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
+  menuMediaTileMenuButtons[2] = new guiButton("Image File", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
+  menuMediaTileMenuButtons[3] = new guiButton("Spout/Syphon", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
+  menuMediaTileMenuButtons[4] = new guiButton("Generated", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
+  menuMediaTileMenuButtons[5] = new guiButton("Data File", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
+  menuMediaTileMenuButtons[6] = new guiButton("External Data", 0, 0, 140, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true); 
 
-  //==========================  FINAL OBJECT SETUP  ================================================
+  //---------------------------------------------  FINAL OBJECT SETUP  ---------------------------------------
 
   genContentText = new generatedText[cMaxGeneratedObjects];
   genContentStarField = new generatedStarField[cMaxGeneratedObjects];
@@ -955,9 +996,9 @@ void setup() {
 
   numberInputFieldPtr = genNIFTextSize; ///set to something, anything
 
-  //==========================  SPOUT TRANSMITTER================================================
+  //---------------------------------------------  SPOUT TRANSMITTER ---------------------------------------
 
-  //Had to define this last, as if a loadSourceContent with spout ran before it, it would grab the first spout sender on the list,
+  //Had to define this last, as if a loadMediaSource with spout ran before it, it would grab the first spout sender on the list,
   // sometimes it would be this spout sender. Then if tried to sendTexture() with a PGraphics it would error.
   //But would work with PImage that was defined with loadImage, but not one that was PGraphics.get()
 
@@ -981,19 +1022,27 @@ void setup() {
    spoutSenderB.createSender("Spout-AllVidRec-B");
    */
 
-  //========================== Start DEBUG ================================================
+  //--------------------------------------------- Start DEBUG ---------------------------------------
 
 
 
-  //========================== END DEBUG ================================================
-  //========================== Final setup and file initliazation ================================================
-
-  LoadUserContentFile("/configs/"+software.configFilePath+"/"+matrix.contentFileName); //load content file
-
+  //--------------------------------------------- END DEBUG ---------------------------------------
+  //--------------------------------------------- Final setup and file initliazation ---------------------------------------
+  
+  //It should load the media content file here, but creates dozens of java.lang.NullPointerException stemming from movie.read() in the event
+  //	Doesn't stop the program or thread and recovers, but not sure how to prevent or fix it
+  //One day it will load it from here, and 
+  //LoadUserContentFile("/configs/"+software.configFilePath+"/"+matrix.contentFileName); //load content file
+  OpenOverlayMenu(cOverlayMainMenu, 0); //will do this instead, user can load it at software startup
+  //still will get a handuful of java.lang.NullPointerException errors, but can be ignored
+  
+  
   MainMixFunction(); //update right away to prevent errors
-  //transmitPixelBuffer = MixedContentGBuf.get(); //errors without this
 
   println("Window scale is: "+SF);
-
   thread("OutputTransmissionThread"); //START TRANSMISSION THREAD
 } //end setup()
+
+//===============================================================================================================================
+
+

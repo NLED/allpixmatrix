@@ -11,23 +11,23 @@ void mousePressed()
     println("X: "+mouseX+"   Y: "+mouseY);
 
     //---------------------------------------------------------
-    for (int i = 0; i != layerAtileButtons.length; i++)
+    for (int i = 0; i != feedLayersTileButtonsA.length; i++)
     {
-      if (layerAtileButtons[i].over())
+      if (feedLayersTileButtonsA[i].over())
       {
         println("Right clicked layer Tile Button A "+i);
-        contentLayerA[i].contentIDNum = 0; //clear content from tile
+        contentLayerA[i].mediaIDNum = 0; //clear content from tile
         return;
       } //end over() if
     } //end for
 
     //---------------------------------------------------------
-    for (int i = 0; i != layerBtileButtons.length; i++)
+    for (int i = 0; i != feedLayersTileButtonsB.length; i++)
     {
-      if (layerBtileButtons[i].over())
+      if (feedLayersTileButtonsB[i].over())
       {
         println("Right clicked layer Tile Button B "+i);
-        contentLayerB[i].contentIDNum = 0; //clear content from tile
+        contentLayerB[i].mediaIDNum = 0; //clear content from tile
         return;
       } //end over() if
     } //end for 
@@ -61,11 +61,13 @@ void mousePressed()
     }
     //---------------------------------------------------------
 
-    if ( mousePressLeftHandler()) return; //doesn't matter if it returns true or false
+    if (mousePressLeftHandler()) return; //doesn't matter if it returns true or false
 
     //nothing detected a mouse press
     allowMousePressHold = false; //clear this
 
+	SelectFeedID = 0; //else clear any layer selection if right click with no target
+	
     //---------------------------------------------------------
   } //end left click else
 } //end mousePressed
@@ -136,9 +138,9 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  for (int i = 0; i != layerBblendModeDD.length; i++)
+  for (int i = 0; i != feedLayersBlendModeDDB.length; i++)
   {
-    if (layerAblendModeDD[i].over())
+    if (feedLayersBlendModeDDA[i].over())
     {
        contentLayerA[i].focusContentLayer(); 
       return true;
@@ -147,9 +149,9 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  for (int i = 0; i != layerBblendModeDD.length; i++)
+  for (int i = 0; i != feedLayersBlendModeDDB.length; i++)
   {
-    if (layerBblendModeDD[i].over()) 
+    if (feedLayersBlendModeDDB[i].over()) 
     {
     contentLayerB[i].focusContentLayer();  
     return true;
@@ -158,9 +160,9 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  for (int i = 0; i != layerAtileButtons.length; i++)
+  for (int i = 0; i != feedLayersTileButtonsA.length; i++)
   {
-    if (layerAtileButtons[i].over())
+    if (feedLayersTileButtonsA[i].over())
     {
       println("Over layer Tile Button A "+i);
       contentLayerA[i].selectContentLayer("A", i);
@@ -170,9 +172,9 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  for (int i = 0; i != layerBtileButtons.length; i++)
+  for (int i = 0; i != feedLayersTileButtonsB.length; i++)
   {
-    if (layerBtileButtons[i].over())
+    if (feedLayersTileButtonsB[i].over())
     {
       println("Over layer Tile Button B "+i);
       contentLayerB[i].selectContentLayer("B", i);
@@ -182,9 +184,9 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  for (int i = 0; i != layerAeffectButtons.length; i++)
+  for (int i = 0; i != feedLayersEffectsButtonsA.length; i++)
   {
-    if (layerAeffectButtons[i].over())
+    if (feedLayersEffectsButtonsA[i].over())
     {
       println("Over effects Button A "+i);
       contentLayerA[i].selectContentLayer("A", i);
@@ -195,9 +197,9 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  for (int i = 0; i != layerBeffectButtons.length; i++)
+  for (int i = 0; i != feedLayersEffectsButtonsB.length; i++)
   {
-    if (layerBeffectButtons[i].over())
+    if (feedLayersEffectsButtonsB[i].over())
     {
       println("Over effects Button B "+i);
       contentLayerB[i].selectContentLayer("B", i);
@@ -208,11 +210,11 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  for (int i = 0; i != layerAsourceOptionButtons.length; i++)
+  for (int i = 0; i != feedLayersOptionsButtonsA.length; i++)
   {
-    if (layerAsourceOptionButtons[i].over())
+    if (feedLayersOptionsButtonsA[i].over())
     {
-      println("Over source option Button A "+i);
+      println("Over media option Button A "+i);
       contentLayerA[i].selectContentLayer("A", i);
       return true;
     } //end over() if
@@ -221,11 +223,11 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  for (int i = 0; i != layerBsourceOptionButtons.length; i++)
+  for (int i = 0; i != feedLayersOptionsButtonsB.length; i++)
   {
-    if (layerBsourceOptionButtons[i].over())
+    if (feedLayersOptionsButtonsB[i].over())
     {
-      println("Over source option Button B "+i);
+      println("Over media option Button B "+i);
       contentLayerB[i].selectContentLayer("B", i);
       return true;
     } //end over() if
@@ -233,9 +235,9 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  for (int i = 0; i != layerOpacitySlidersA.length; i++)
+  for (int i = 0; i != feedLayersOpacitySliderA.length; i++)
   {
-    if (layerOpacitySlidersA[i].over()) 
+    if (feedLayersOpacitySliderA[i].over()) 
     {
       contentLayerA[i].focusContentLayer(); 
       return true;
@@ -244,9 +246,9 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  for (int i = 0; i != layerOpacitySlidersB.length; i++)
+  for (int i = 0; i != feedLayersOpacitySliderB.length; i++)
   {
-    if (layerOpacitySlidersB[i].over())  
+    if (feedLayersOpacitySliderB[i].over())  
     {
       contentLayerB[i].focusContentLayer(); 
       return true;
@@ -259,10 +261,9 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
   {
     if (feedLayersPlayPauseA[i].over())
     {
-      println("Over source play/pause - Feed A "+i);
-      //action  
-      if (feedLayersPlayPauseA[i].selected == true) sourceConentTile[contentLayerA[i].contentIDNum].setPlayMode(1); //pause
-      else sourceConentTile[contentLayerA[i].contentIDNum].setPlayMode(0); //play     
+      println("Over media play/pause - Feed A "+i);
+      if (feedLayersPlayPauseA[i].selected == true) mediaContentTile[contentLayerA[i].mediaIDNum].setPlayMode(1); //pause
+      else mediaContentTile[contentLayerA[i].mediaIDNum].setPlayMode(0); //play     
       return true;
     } //end over() if
   } //end for
@@ -273,18 +274,17 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
   {
     if (feedLayersPlayPauseB[i].over())
     {
-      println("Over source play/pause - Feed B "+i);
-      //action  
-      if (feedLayersPlayPauseB[i].selected == true) sourceConentTile[contentLayerB[i].contentIDNum].setPlayMode(1); //pause
-      else sourceConentTile[contentLayerB[i].contentIDNum].setPlayMode(0); //play
+      println("Over media play/pause - Feed B "+i);
+      if (feedLayersPlayPauseB[i].selected == true) mediaContentTile[contentLayerB[i].mediaIDNum].setPlayMode(1); //pause
+      else mediaContentTile[contentLayerB[i].mediaIDNum].setPlayMode(0); //play 
       return true;
     } //end over() if
   } //end for
 
 
-  for (int i = 0; i != layerASpeedNIF.length; i++)
+  for (int i = 0; i != feedLayersSpeedNIFA.length; i++)
   {
-    if (layerASpeedNIF[i].over()) 
+    if (feedLayersSpeedNIFA[i].over()) 
     {
       contentLayerA[i].focusContentLayer(); 
       return true;
@@ -292,42 +292,43 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
   } //end for
 
 
-  for (int i = 0; i != layerBSpeedNIF.length; i++)
+  for (int i = 0; i != feedLayersSpeedNIFB.length; i++)
   {
-    if (layerBSpeedNIF[i].over()) 
+    if (feedLayersSpeedNIFB[i].over()) 
     {
       contentLayerB[i].focusContentLayer(); 
       return true;
     }
   } //end for
 
-
   //------------------------ START COMMON ELEMENTS ---------------------------------
 
-  for (int i = 0; i != contentSelectionButtons.length; i++)
+  for (int i = 0; i != mediaTileSelectionButtons.length; i++)
   {
-    if (contentSelectionButtons[i].over())
+    if (mediaTileSelectionButtons[i].over())
     {
-      //  println("Over content selection Button "+i+" ScrollBar Offset: "+(sourceContentScrollBar.Value+i));
-      if ((sourceContentScrollBar.value+i) == (DefinedContentSources))
+      //println("Over content selection Button "+i+" ScrollBar Offset: "+(mediaContentScrollBar.value+i)+"    DefinedMediaTiles: "+DefinedMediaTiles);
+      if ((mediaContentScrollBar.value+i) == DefinedMediaTiles)
       {
         //its a click on a tile one after the last one, indicating add source
-        println("open content source menu. With "+(DefinedContentSources+1));
-        OpenOverlayMenu(cOverlaySourceContent, DefinedContentSources+1);
-      } else if ((sourceContentScrollBar.value+i) < DefinedContentSources)
+        println("open media content menu to add. With "+(DefinedMediaTiles+1));
+        OpenOverlayMenu(cOverlayMediaTileMenu, DefinedMediaTiles+1);
+      } 
+	  else if ((mediaContentScrollBar.value+i) < DefinedMediaTiles)
       {
-        println("Open menu to edit tile source content. Button "+i+" ScrollBar Offset: "+(sourceContentScrollBar.value+i));
-
         if (SelectFeedID > 0) 
         {
-          FillContentLayer((sourceContentScrollBar.value+i+1));
+          FillContentLayer((mediaContentScrollBar.value+i+1));
           return true;
         }
 
-        OpenOverlayMenu(cOverlaySourceContent, (sourceContentScrollBar.value+i+1));
-      } else
+	     println("Open menu to edit tile media content. Button "+i+" ScrollBar Offset: "+(mediaContentScrollBar.value+i));
+		
+        OpenOverlayMenu(cOverlayMediaTileMenu, (mediaContentScrollBar.value+i+1));
+      } 
+	  else
       {
-        println("Clicked content source button not available");
+        println("Clicked media content button not available");
       }
       return true;
     } //end over() if
@@ -367,18 +368,16 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   if (feedPlayPauseA.over())
   {
-    //pause all Feed A layers
-    println("Toggling Feed A play mode");
-    if (feedPlayPauseA.selected == true) FeedPlayModeA = 1; //0 = play, 1 = pause
-    else  FeedPlayModeA = 0; //0 = play, 1 = pause
+    //pause all Feed A layers 
+    if (feedPlayPauseA.selected == true) SetFeedAPausePlay(1); //0 = play, 1 = pause
+    else  SetFeedAPausePlay(0);//0 = play, 1 = pause
   }
 
   if (feedPlayPauseB.over())
   {
     //pause all Feed B layers
-    println("Toggling Feed B play mode");
-    if (feedPlayPauseB.selected == true) FeedPlayModeB = 1; //0 = play, 1 = pause
-    else  FeedPlayModeB = 0; //0 = play, 1 = pause
+    if (feedPlayPauseB.selected == true) SetFeedBPausePlay(1); //0 = play, 1 = pause
+    else  SetFeedBPausePlay(0);//0 = play, 1 = pause
   }
 
   //---------------------------------------------------------
@@ -402,14 +401,16 @@ boolean mousePressLeftHandler() //this function is created so it can be called f
 
   //---------------------------------------------------------
 
-  if (sourceContentScrollBar.over()) return true;
+  if (mediaContentScrollBar.over()) return true;
 
   //---------------------------------------------------------
 
   if (mainCrossFader.over()) return true;
+  
   //---------------------------------------------------------
 
   if (mainIntensityFader.over()) return true;
+  
   //---------------------------------------------------------
 
   if (intensitySliderA.over()) return true;
@@ -440,9 +441,9 @@ void mouseReleased()
 void mouseDragged()
 {
   //The mouseDragged() function is called once every time the mouse moves while a mouse button is pressed. (If a button is not being pressed, mouseMoved() is called instead.) 
-  //  println("MouseDragging");
-  // allowMousePressHold = false;
-  //  if(GlobalDragging == true) redraw();
+  //println("MouseDragging");
+  //allowMousePressHold = false;
+  //if(GlobalDragging == true) redraw();
 }
 
 //======================================================================================================================
@@ -463,9 +464,9 @@ void mouseMoved()
 
     for (int i = 0; i != DropDownList.size(); i++) 
     { 
-      //   DropDownListPointer = DropDownList.get(i); // An ArrayList doesn't know what it is storing so we have to cast the object coming out
-      //  if (DropDownListPointer.mouseOver()) return; //no other way to highlight, have to redraw
-      //  if (DropDownListPointer.mouseOverOpen()) return; //no other way to highlight, have to redraw
+      //DropDownListPointer = DropDownList.get(i); // An ArrayList doesn't know what it is storing so we have to cast the object coming out
+      //if (DropDownListPointer.mouseOver()) return; //no other way to highlight, have to redraw
+      //if (DropDownListPointer.mouseOverOpen()) return; //no other way to highlight, have to redraw
 
       if (DropDownList.get(i).mouseOver()) return; //no other way to highlight, have to redraw
       if (DropDownList.get(i).mouseOverOpen()) return; //no other way to highlight, have to redraw
@@ -518,11 +519,12 @@ void mouseWheel(MouseEvent event)
     //no overlay menu is open
     if (mouseXS > 0 && mouseXS < cDefaultGUIWidth && mouseYS > 650 && mouseYS < cDefaultGUIHeight)
     {
-      //println("mouseWheel() - Over source content menu area");
-      if (event.getCount() > 0 && sourceContentScrollBar.value > 0) sourceContentScrollBar.value--;
-      else if (event.getCount() < 0 && sourceContentScrollBar.value < sourceContentScrollBar.max) sourceContentScrollBar.value++;
+      //println("mouseWheel() - Over media content menu area");
+      if (event.getCount() > 0 && mediaContentScrollBar.value > 0) mediaContentScrollBar.value--;
+      else if (event.getCount() < 0 && mediaContentScrollBar.value < mediaContentScrollBar.max) mediaContentScrollBar.value++;
+	  mediaContentSliderFunc();
     }
   }
 
-  //also want to do the intensity and opacity sliders, along with main mixer
+  //also want to do the intensity and opacity sliders, along with main mixer in the future
 } //end mousewheel

@@ -24,12 +24,10 @@
  Copyright 2018
  Company: Northern Lights Electronic Design, LLC
  Contact: JNygaard@NLEDShop.com
- Date Updated: June 19, 2018 
- Software Version:  BETA 0.1
+ Date Updated: December 17, 2018 
+ Software Version:  v.1a
  Webpage: www.NLEDShop.com/nledallpixmatrix
- Written in Processing v3.3.7  - www.Processing.org
- 
- THIS SOFTWARE IS IN BETA - PLEASE REPORT BUGS
+ Written in Processing v3.4  - www.Processing.org
  
  ======================================================================================================================================
  
@@ -58,3 +56,24 @@ Previously I have had reports that USB enabled Arduinos may not work with the de
 can not handle the data volume. So the stack may need to be adjusted or rewritten.
 
 Maximum Size matrix: 512x512 - not tested or know if it would actually work. But software would support it.
+
+Other Required Software:
+NLED Patcher for creating matrix patch files - https://www.nledshop.com/nledpatcher/
+
+ ======================================================================================================================================
+ 
+Changes BETA 0.99 to v.1a
+	- numerous GUI fixes
+	- Star fieild 'twinkle' changed to z-distance
+	- Updated media crop/resize options
+	- Centered matrix preview grids
+	- Numerous fixes to prevent stalls/freezes when loading external data streams
+	- Fixed per layer pausing and feed pausing
+	- Fixed issues with re-loading config files during application runtime
+	- Renamed numerous variables and objects with more refined naming schemes
+	- Added option to record to file for string or binary/raw formated files
+	
+======================================================================================================================================
+
+See AllPixMatrix.pde for additional notes and details
+

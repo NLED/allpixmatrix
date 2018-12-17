@@ -2,89 +2,89 @@
 
 void generatedContentBarsModeFunc()
 {
-  genContentBars[sourceConentTile[workingTileID].instanceID].mode = DropDownPointer.getValue();
+  genContentBars[mediaContentTile[workingTileID].instanceID].mode = DropDownPointer.getValue();
 }
 
 void generatedContentBarsAudioModeFunc()
 {
-  genContentBars[sourceConentTile[workingTileID].instanceID].audioMode = DropDownPointer.getValue();
+  genContentBars[mediaContentTile[workingTileID].instanceID].audioMode = DropDownPointer.getValue();
 }
 
 void generatedContentBarsWidthFunc()
 {
   genericNumberInputField();
-  genContentBars[sourceConentTile[workingTileID].instanceID].barWidth = (int)numberInputFieldPtr.value;
+  genContentBars[mediaContentTile[workingTileID].instanceID].barWidth = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentBarsSpacingFunc()
 {
   genericNumberInputField();
-  genContentBars[sourceConentTile[workingTileID].instanceID].barSpacing = (int)numberInputFieldPtr.value;
+  genContentBars[mediaContentTile[workingTileID].instanceID].barSpacing = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentBarsAmplitudeFunc()
 {
   genericNumberInputField();
-  genContentBars[sourceConentTile[workingTileID].instanceID].barAmplitude = (int)numberInputFieldPtr.value;
+  genContentBars[mediaContentTile[workingTileID].instanceID].barAmplitude = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentBarsDecayFunc()
 {
   genericNumberInputField();
-  genContentBars[sourceConentTile[workingTileID].instanceID].decay = numberInputFieldPtr.value; //stay as float
+  genContentBars[mediaContentTile[workingTileID].instanceID].decay = numberInputFieldPtr.value; //stay as float
 }
 
 void generatedContentBarsFillColorFunc()
 {
-  genContentBars[sourceConentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
+  genContentBars[mediaContentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
 }
 
 //======================================================================================================
 
 void generatedContentSineWaveModeFunc()
 {
-  genContentSineWave[sourceConentTile[workingTileID].instanceID].mode = DropDownPointer.getValue();
+  genContentSineWave[mediaContentTile[workingTileID].instanceID].mode = DropDownPointer.getValue();
 }
 
 void generatedContentSineWaveAudioModeFunc()
 {
-  genContentSineWave[sourceConentTile[workingTileID].instanceID].audioMode = DropDownPointer.getValue();
+  genContentSineWave[mediaContentTile[workingTileID].instanceID].audioMode = DropDownPointer.getValue();
 }
 
 void generatedContentSineWaveYOffsetFunc()
 {
   genericNumberInputField();
-  genContentSineWave[sourceConentTile[workingTileID].instanceID].yOffset = (int)numberInputFieldPtr.value;
+  genContentSineWave[mediaContentTile[workingTileID].instanceID].yOffset = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentSineWaveAmplitudeFunc()
 {
   genericNumberInputField();
-  genContentSineWave[sourceConentTile[workingTileID].instanceID].amplitude = (int)numberInputFieldPtr.value;
+  genContentSineWave[mediaContentTile[workingTileID].instanceID].amplitude = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentSineWavePeriodFunc()
 {
   genericNumberInputField();
-  genContentSineWave[sourceConentTile[workingTileID].instanceID].period = (int)numberInputFieldPtr.value;
+  genContentSineWave[mediaContentTile[workingTileID].instanceID].period = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentSineWaveDecayFunc()
 {
   genericNumberInputField();
-  genContentSineWave[sourceConentTile[workingTileID].instanceID].decay = numberInputFieldPtr.value; //stay as float
+  genContentSineWave[mediaContentTile[workingTileID].instanceID].decay = numberInputFieldPtr.value; //stay as float
 }
 
 void generatedContentSineWaveFillColorFunc()
 {
-  genContentSineWave[sourceConentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
+  genContentSineWave[mediaContentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
 }
 
 //======================================================================================================
 
 void generatedContentColorGenFunc()
 {
-  genContentSolidColor[sourceConentTile[workingTileID].instanceID].bgColor = color(guiColorSelectorMenu.red, guiColorSelectorMenu.green, guiColorSelectorMenu.blue, guiColorSelectorMenu.alpha);  //colorSquarePtr.selColor;
+  genContentSolidColor[mediaContentTile[workingTileID].instanceID].bgColor = color(guiColorSelectorMenu.red, guiColorSelectorMenu.green, guiColorSelectorMenu.blue, guiColorSelectorMenu.alpha);  //colorSquarePtr.selColor;
 }
 
 //======================================================================================================
@@ -110,36 +110,36 @@ void generatedContentTemplateSizeFunc()
 
 void generatedContent3DShapeStrokeColorFunc()
 {
-  genContent3DShape[sourceConentTile[workingTileID].instanceID].strokeColor = colorSquarePtr.selColor;
+  genContent3DShape[mediaContentTile[workingTileID].instanceID].strokeColor = colorSquarePtr.selColor;
 }
 
 void generatedContent3DShapeSizeFunc()
 {
   genericNumberInputField();
-  genContent3DShape[sourceConentTile[workingTileID].instanceID].size = (int)numberInputFieldPtr.value;
+  genContent3DShape[mediaContentTile[workingTileID].instanceID].size = (int)numberInputFieldPtr.value;
 }
 
 void generatedContent3DShapeStrokeWidthFunc()
 {
   genericNumberInputField();
-  genContent3DShape[sourceConentTile[workingTileID].instanceID].strokeWeight = (int)numberInputFieldPtr.value;
+  genContent3DShape[mediaContentTile[workingTileID].instanceID].strokeWeight = (int)numberInputFieldPtr.value;
 }
 
 void generatedContent3DShapeRotXFunc()
 {
   genericNumberInputField();
-  genContent3DShape[sourceConentTile[workingTileID].instanceID].rotationValX = (int)numberInputFieldPtr.value;
+  genContent3DShape[mediaContentTile[workingTileID].instanceID].rotationValX = (int)numberInputFieldPtr.value;
 }
 
 void generatedContent3DShapeRotYFunc()
 {
   genericNumberInputField();
-  genContent3DShape[sourceConentTile[workingTileID].instanceID].rotationValY = (int)numberInputFieldPtr.value;
+  genContent3DShape[mediaContentTile[workingTileID].instanceID].rotationValY = (int)numberInputFieldPtr.value;
 }
 
 void generatedContent3DShapeSmoothingFunc()
 {
-  genContent3DShape[sourceConentTile[workingTileID].instanceID].enableSmoothing = gen3DShapeEnableSmoothing.selected;
+  genContent3DShape[mediaContentTile[workingTileID].instanceID].enableSmoothing = gen3DShapeEnableSmoothing.selected;
 }
 
 //======================================================================================================
@@ -147,82 +147,82 @@ void generatedContent3DShapeSmoothingFunc()
 void generatedContent2DShapeRotSpeedFunc()
 {
   genericNumberInputField();
-  genContent2DShape[sourceConentTile[workingTileID].instanceID].rotationSpeed = (int)numberInputFieldPtr.value;
+  genContent2DShape[mediaContentTile[workingTileID].instanceID].rotationSpeed = (int)numberInputFieldPtr.value;
 }
 
 void generatedContent2DShapeZoomSpeedFunc()
 {
   genericNumberInputField();
-  genContent2DShape[sourceConentTile[workingTileID].instanceID].zoomSpeed = (int)numberInputFieldPtr.value;
+  genContent2DShape[mediaContentTile[workingTileID].instanceID].zoomSpeed = (int)numberInputFieldPtr.value;
 }
 
 void generatedContent2DShapeZoomMinFunc()
 {
   genericNumberInputField();
-  genContent2DShape[sourceConentTile[workingTileID].instanceID].zoomMin = (int)numberInputFieldPtr.value;
+  genContent2DShape[mediaContentTile[workingTileID].instanceID].zoomMin = (int)numberInputFieldPtr.value;
 }
 
 void generatedContent2DShapeZoomMaxFunc()
 {
   genericNumberInputField();
-  genContent2DShape[sourceConentTile[workingTileID].instanceID].zoomMax = (int)numberInputFieldPtr.value;
+  genContent2DShape[mediaContentTile[workingTileID].instanceID].zoomMax = (int)numberInputFieldPtr.value;
 }
 
 void generatedContent2DShapeFillColorFunc()
 {
-  genContent2DShape[sourceConentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
+  genContent2DShape[mediaContentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
 }
 
 void generatedContent2DShapeStrokeColorFunc()
 {
-  genContent2DShape[sourceConentTile[workingTileID].instanceID].strokeColor = colorSquarePtr.selColor;
+  genContent2DShape[mediaContentTile[workingTileID].instanceID].strokeColor = colorSquarePtr.selColor;
 }
 
 void generatedContent2DShapeStrokeWidthFunc()
 {
   genericNumberInputField();
-  genContent2DShape[sourceConentTile[workingTileID].instanceID].strokeWeight = (int)numberInputFieldPtr.value;
+  genContent2DShape[mediaContentTile[workingTileID].instanceID].strokeWeight = (int)numberInputFieldPtr.value;
 }
 
 void generatedContent2DShapeSizeFunc()
 {
   genericNumberInputField();
-  genContent2DShape[sourceConentTile[workingTileID].instanceID].baseSize = (int)numberInputFieldPtr.value;
+  genContent2DShape[mediaContentTile[workingTileID].instanceID].baseSize = (int)numberInputFieldPtr.value;
 }
 
 void generatedContent2DShapeSmoothingFunc()
 {
-  genContent2DShape[sourceConentTile[workingTileID].instanceID].enableSmoothing = gen2DShapeEnableSmoothing.selected;
+  genContent2DShape[mediaContentTile[workingTileID].instanceID].enableSmoothing = gen2DShapeEnableSmoothing.selected;
 }
 
 //======================================================================================================
 
 void generatedContentSpiralColorFunc()
 {
-  genContentSpiral[sourceConentTile[workingTileID].instanceID].strokeColor = colorSquarePtr.selColor;
+  genContentSpiral[mediaContentTile[workingTileID].instanceID].strokeColor = colorSquarePtr.selColor;
 }
 
 void generatedContentSpiralColorModeFunc()
 {
-  genContentSpiral[sourceConentTile[workingTileID].instanceID].colorMode = genSpiralColorMode.getValue();
+  genContentSpiral[mediaContentTile[workingTileID].instanceID].colorMode = genSpiralColorMode.getValue();
 }
 
 void generatedContentSpiralModeVariableFunc()
 {
   genericNumberInputField();
-  genContentSpiral[sourceConentTile[workingTileID].instanceID].modeVariable = (int)numberInputFieldPtr.value;
+  genContentSpiral[mediaContentTile[workingTileID].instanceID].modeVariable = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentSpiralCoilsFunc()
 {
   genericNumberInputField();
-  genContentSpiral[sourceConentTile[workingTileID].instanceID].coils = (int)numberInputFieldPtr.value;
+  genContentSpiral[mediaContentTile[workingTileID].instanceID].coils = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentSpiralDecayFunc()
 {
   genericNumberInputField();
-  genContentSpiral[sourceConentTile[workingTileID].instanceID].decay = numberInputFieldPtr.value; //stay as float
+  genContentSpiral[mediaContentTile[workingTileID].instanceID].decay = numberInputFieldPtr.value; //stay as float
 }
 
 //======================================================================================================
@@ -230,187 +230,187 @@ void generatedContentSpiralDecayFunc()
 void generatedContentRipplAmplitudeFunc()
 {
   genericNumberInputField();
-  genContentRipples[sourceConentTile[workingTileID].instanceID].amplitude = (int)numberInputFieldPtr.value;
+  genContentRipples[mediaContentTile[workingTileID].instanceID].amplitude = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentRipplAudioModeFunc()
 {
-  genContentRipples[sourceConentTile[workingTileID].instanceID].audioMode = DropDownPointer.getValue();
+  genContentRipples[mediaContentTile[workingTileID].instanceID].audioMode = DropDownPointer.getValue();
 }
 
 void generatedContentRippleFillColorFunc()
 {
-  genContentRipples[sourceConentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
+  genContentRipples[mediaContentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
 }
 
 void generatedContentRippleStrokeColorFunc()
 {
-  genContentRipples[sourceConentTile[workingTileID].instanceID].strokeColor = colorSquarePtr.selColor;
+  genContentRipples[mediaContentTile[workingTileID].instanceID].strokeColor = colorSquarePtr.selColor;
 }
 
 void generatedContentRippleFillMethod()
 {
-  genContentRipples[sourceConentTile[workingTileID].instanceID].fillMethod = DropDownPointer.getValue();
+  genContentRipples[mediaContentTile[workingTileID].instanceID].fillMethod = DropDownPointer.getValue();
 }
 
 void generatedContentRippleShape()
 {
-  genContentRipples[sourceConentTile[workingTileID].instanceID].shape = DropDownPointer.getValue();
+  genContentRipples[mediaContentTile[workingTileID].instanceID].shape = DropDownPointer.getValue();
 }
 
 void generatedContentRippleStrokeWidth()
 {
   genericNumberInputField();
-  genContentRipples[sourceConentTile[workingTileID].instanceID].strokeWeight = (int)numberInputFieldPtr.value;
+  genContentRipples[mediaContentTile[workingTileID].instanceID].strokeWeight = (int)numberInputFieldPtr.value;
 }
 
 //======================================================================================================
 
 void generatedContentMetaBallsColorFunc()
 {
-  genContentMetaBalls[sourceConentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
+  genContentMetaBalls[mediaContentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
 }
 
 void generatedContentMetaBallsColorModeFunc()
 {
-  genContentMetaBalls[sourceConentTile[workingTileID].instanceID].colorMode = genMetaBallsColorMode.getValue();
+  genContentMetaBalls[mediaContentTile[workingTileID].instanceID].colorMode = genMetaBallsColorMode.getValue();
 }
 
 void generatedContentMetaBallsAmountFunc()
 {
   genericNumberInputField();
-  genContentMetaBalls[sourceConentTile[workingTileID].instanceID].ballAmount = (int)numberInputFieldPtr.value;
+  genContentMetaBalls[mediaContentTile[workingTileID].instanceID].ballAmount = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentMetaBallsSizeFunc()
 {
   genericNumberInputField();
-  genContentMetaBalls[sourceConentTile[workingTileID].instanceID].ballSize = (int)numberInputFieldPtr.value;
+  genContentMetaBalls[mediaContentTile[workingTileID].instanceID].ballSize = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentMetaBallsFrequencyFunc()
 {
   genericNumberInputField();
-  genContentMetaBalls[sourceConentTile[workingTileID].instanceID].colorFrequency = (int)numberInputFieldPtr.value;
+  genContentMetaBalls[mediaContentTile[workingTileID].instanceID].colorFrequency = (int)numberInputFieldPtr.value;
 }
 
 //======================================================================================================
 
 void generatedContentFallingColorFunc()
 {
-  genContentFallingBlocks[sourceConentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
+  genContentFallingBlocks[mediaContentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
 }
 
 void generatedContentFallingBlocksDirectionFunc()
 {
-  genContentFallingBlocks[sourceConentTile[workingTileID].instanceID].direction = genFallingBlocksDirection.getValue();
+  genContentFallingBlocks[mediaContentTile[workingTileID].instanceID].direction = genFallingBlocksDirection.getValue();
 }
 
 void generatedContentFallingBlocksSizeFunc()
 {
   genericNumberInputField();
-  genContentFallingBlocks[sourceConentTile[workingTileID].instanceID].size = (int)numberInputFieldPtr.value;
+  genContentFallingBlocks[mediaContentTile[workingTileID].instanceID].size = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentFallingBlocksDecayFunc()
 {
   genericNumberInputField();
-  genContentFallingBlocks[sourceConentTile[workingTileID].instanceID].decay = numberInputFieldPtr.value; //already a float, no typecast
+  genContentFallingBlocks[mediaContentTile[workingTileID].instanceID].decay = numberInputFieldPtr.value; //already a float, no typecast
 }
 
 void generatedContentFallingBlocksFreqFunc()
 {
   genericNumberInputField();
-  genContentFallingBlocks[sourceConentTile[workingTileID].instanceID].frequency = (int)numberInputFieldPtr.value;
+  genContentFallingBlocks[mediaContentTile[workingTileID].instanceID].frequency = (int)numberInputFieldPtr.value;
 }
 
 //======================================================================================================
 
 void generatedContentStarsStrokeColorFunc()
 {
-  genContentStarField[sourceConentTile[workingTileID].instanceID].strokeColor = colorSquarePtr.selColor;
+  genContentStarField[mediaContentTile[workingTileID].instanceID].strokeColor = colorSquarePtr.selColor;
 }
 
 void generatedContentStarsColorFunc()
 {
-  genContentStarField[sourceConentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
+  genContentStarField[mediaContentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
 }
 
-void generatedContentStarsTwinkleFunc()
+void generatedContentStarsZDistFunc()
 {
-  genContentStarField[sourceConentTile[workingTileID].instanceID].starTwinkle = genStarsTwinkleEnable.selected;
+  genContentStarField[mediaContentTile[workingTileID].instanceID].starZDist = genStarsZDistEnable.selected;
 }
 
 void generatedContentStarsStrokeFunc()
 {
   genericNumberInputField();
-  genContentStarField[sourceConentTile[workingTileID].instanceID].starStrokeWidth = (int)numberInputFieldPtr.value;
+  genContentStarField[mediaContentTile[workingTileID].instanceID].starStrokeWidth = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentStarsShapeFuncSizeFunc()
 {
   genericNumberInputField();
-  genContentStarField[sourceConentTile[workingTileID].instanceID].starSize = (int)numberInputFieldPtr.value;
+  genContentStarField[mediaContentTile[workingTileID].instanceID].starSize = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentStarsQuantityFunc()
 {
   genericNumberInputField();
-  genContentStarField[sourceConentTile[workingTileID].instanceID].starQuantity = (int)numberInputFieldPtr.value;
+  genContentStarField[mediaContentTile[workingTileID].instanceID].starQuantity = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentStarsShapeFunc()
 {
-  genContentStarField[sourceConentTile[workingTileID].instanceID].starShape = genStarsShapeDD.getValue();
+  genContentStarField[mediaContentTile[workingTileID].instanceID].starShape = genStarsShapeDD.getValue();
 }
 
 void generatedContentStarsDecayFunc()
 {
   genericNumberInputField();
-  genContentStarField[sourceConentTile[workingTileID].instanceID].decay = numberInputFieldPtr.value;
+  genContentStarField[mediaContentTile[workingTileID].instanceID].decay = numberInputFieldPtr.value;
 }
 
 //======================================================================================================
 
 void generatedContentTextBGColorFunc()
 {
-  genContentText[sourceConentTile[workingTileID].instanceID].bgColor = colorSquarePtr.selColor;
+  genContentText[mediaContentTile[workingTileID].instanceID].bgColor = colorSquarePtr.selColor;
 }
 
 void generatedContentTextColorFunc()
 {
-  genContentText[sourceConentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
+  genContentText[mediaContentTile[workingTileID].instanceID].fillColor = colorSquarePtr.selColor;
 }
 
 void generatedContentTextSizeFunc()
 {
   genericNumberInputField(); 
-  genContentText[sourceConentTile[workingTileID].instanceID].textSize = (int)numberInputFieldPtr.value;
-  println("Used "+sourceConentTile[workingTileID].instanceID);
+  genContentText[mediaContentTile[workingTileID].instanceID].textSize = (int)numberInputFieldPtr.value;
+  println("Used "+mediaContentTile[workingTileID].instanceID);
 }
 
 void generatedContentTextXFunc()
 {
   genericNumberInputField(); 
-  genContentText[sourceConentTile[workingTileID].instanceID].xOffset = (int)numberInputFieldPtr.value;
+  genContentText[mediaContentTile[workingTileID].instanceID].xOffset = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentTextYFunc()
 {
   genericNumberInputField(); 
-  genContentText[sourceConentTile[workingTileID].instanceID].yOffset = (int)numberInputFieldPtr.value;
+  genContentText[mediaContentTile[workingTileID].instanceID].yOffset = (int)numberInputFieldPtr.value;
 }
 
 void generatedContentTextLabelFunc()
 {
-  genContentText[sourceConentTile[workingTileID].instanceID].textLabel = genTextLabel.label;
+  genContentText[mediaContentTile[workingTileID].instanceID].textLabel = genTextLabel.label;
   genericHandlerTextField(); // just sets pointer obj to false
 }
 
 void generatedContentTextScrollType()
 {
-  genContentText[sourceConentTile[workingTileID].instanceID].scrollingType = genTextScrollTypeDD.getValue();
-  genContentText[sourceConentTile[workingTileID].instanceID].scrollVal = 0; //reset scrolling value when type is changed
+  genContentText[mediaContentTile[workingTileID].instanceID].scrollingType = genTextScrollTypeDD.getValue();
+  genContentText[mediaContentTile[workingTileID].instanceID].scrollVal = 0; //reset scrolling value when type is changed
 }
 
 

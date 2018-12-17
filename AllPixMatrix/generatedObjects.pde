@@ -1,6 +1,6 @@
 
 //To add generated content:
-//Update loadSourceContent method switch and updateContent() method switch
+//Update loadMediaSource method switch and updateMedia() method switch
 //Declare and Define GUI elements
 //Update overlaymenu initMenu() method to place and init the gui elements
 //
@@ -953,14 +953,12 @@ class generatedSpiral
     if (colorMode == 1)
     {
       hue+=modeVariable; //cycle through
-      if (hue>=100) {
-        hue=hue-100;
-      }
-    } else if (colorMode == 2)  hue = 0; //reset if in colormode offset
+      if (hue>=100)         hue=hue-100;
+    } 
+	else if (colorMode == 2)  hue = 0; //reset if in colormode offset
 
-    rotation += 0.5; //rotate spiral
-    //  if (ReverseFlag == true) rotation += 0.5; //rotate spiral
-    //   else rotation -= 0.5; //rotate spiral
+    rotation -= 0.5; //rotate spiral CCW
+   // rotation += 0.5; //rotate spiral CW	
 
     localPGBuf.endDraw();
   }
@@ -1494,7 +1492,7 @@ class generatedStarField
   int starQuantity;
   int starStrokeWidth;
   float decay;
-  boolean starTwinkle; 
+  boolean starZDist; 
   color fillColor;
   color strokeColor;
 
@@ -1504,7 +1502,7 @@ class generatedStarField
   int refreshPoint; //starfield
   float [] ypos;
   float [] xpos;
-  float twinkleValue;
+  float zDistValue;
 
   generatedStarField()
   {
@@ -1525,7 +1523,7 @@ class generatedStarField
     starSize = 1;
     fillColor = color(255, 255, 255, 255); //default white
     starStrokeWidth = 0;
-    starTwinkle = false;
+    starZDist = false;
 
     //randomize intial positions
     for (instance = 0; instance < reps; instance ++) 
@@ -1538,7 +1536,7 @@ class generatedStarField
 
   String saveParameters()
   {
-    return starShape+cFileSep+starSize+cFileSep+starQuantity+cFileSep+starStrokeWidth+cFileSep+decay+cFileSep+starTwinkle+cFileSep+
+    return starShape+cFileSep+starSize+cFileSep+starQuantity+cFileSep+starStrokeWidth+cFileSep+decay+cFileSep+starZDist+cFileSep+
       int(red(fillColor))+cFileSep+int(green(fillColor))+cFileSep+int(blue(fillColor))+cFileSep+int(alpha(fillColor))+cFileSep+
       int(red(strokeColor))+cFileSep+int(green(strokeColor))+cFileSep+int(blue(strokeColor))+cFileSep+int(alpha(strokeColor));
   }
@@ -1553,7 +1551,7 @@ class generatedStarField
     starQuantity = int(WorkString[2]);
     starStrokeWidth = int(WorkString[3]);
     decay = float(WorkString[4]);   
-    starTwinkle = boolean(WorkString[5]);  
+    starZDist = boolean(WorkString[5]);  
     fillColor = color(int(WorkString[6]), int(WorkString[7]), int(WorkString[8]), int(WorkString[9]));
     strokeColor = color(int(WorkString[10]), int(WorkString[11]), int(WorkString[12]), int(WorkString[13]));
   }
@@ -1575,11 +1573,11 @@ class generatedStarField
     if (starStrokeWidth > 0) localPGBuf.strokeWeight(starStrokeWidth);  //would like to control this as well but its not worth additional effort
     else localPGBuf.noStroke();
 
-    twinkleValue = (255/starQuantity); //create float
+    zDistValue = (255/starQuantity); //create float
 
     for (instance = 0; instance < starQuantity; instance ++) 
     {
-      if (starTwinkle == true) localPGBuf.fill(fillColor, (twinkleValue*instance));
+      if (starZDist == true) localPGBuf.fill(fillColor, (zDistValue*instance));
       else localPGBuf.fill(fillColor, 255); //fill white
 
       if (starShape == 0 || starShape == 1) localPGBuf.rect(int(xpos[instance])+(matrix.width/2), int(ypos[instance])+(matrix.height/2), starSize, starSize);
@@ -1761,52 +1759,52 @@ void DecayBuffer(float passedValue, PGraphics buf)
 void DisposeGeneratedObjects()
 {
   try {
-    switch(sourceConentTile[workingTileID].generatedType)   //add additional generated types/objects here
+    switch(mediaContentTile[workingTileID].generatedType)   //add additional generated types/objects here
     {
     case 0: //null
 
       break;
     case 1: //Text
-      genContentText[sourceConentTile[workingTileID].instanceID] = null;
+      genContentText[mediaContentTile[workingTileID].instanceID] = null;
       break;
     case 2: //Star Field
-      genContentStarField[sourceConentTile[workingTileID].instanceID] = null;
+      genContentStarField[mediaContentTile[workingTileID].instanceID] = null;
       break;
     case 3: //Falling Blocks
-      genContentFallingBlocks[sourceConentTile[workingTileID].instanceID] = null;
+      genContentFallingBlocks[mediaContentTile[workingTileID].instanceID] = null;
       break;
     case 4: //"Meta Balls"
-      genContentMetaBalls[sourceConentTile[workingTileID].instanceID] = null;
+      genContentMetaBalls[mediaContentTile[workingTileID].instanceID] = null;
       break;
     case 5: //"Ripples"
-      genContentRipples[sourceConentTile[workingTileID].instanceID] = null;
+      genContentRipples[mediaContentTile[workingTileID].instanceID] = null;
       break;       
     case 6: //"Spiral"
-      genContentSpiral[sourceConentTile[workingTileID].instanceID] = null;
+      genContentSpiral[mediaContentTile[workingTileID].instanceID] = null;
       break;    
     case 7: //"Solid Color"
-      genContentSolidColor[sourceConentTile[workingTileID].instanceID] = null;
+      genContentSolidColor[mediaContentTile[workingTileID].instanceID] = null;
       break;        
     case 8: //"Plasma"
-      genContentPlasma[sourceConentTile[workingTileID].instanceID] = null;
+      genContentPlasma[mediaContentTile[workingTileID].instanceID] = null;
       break;
     case 9: //"2D Shape"
-      genContent2DShape[sourceConentTile[workingTileID].instanceID] = null;
+      genContent2DShape[mediaContentTile[workingTileID].instanceID] = null;
       break;
     case 10:  //"3D Shape"
-      genContent3DShape[sourceConentTile[workingTileID].instanceID] = null;
+      genContent3DShape[mediaContentTile[workingTileID].instanceID] = null;
       break;
     case 11:  //"Sine Wave"
-      genContentSineWave[sourceConentTile[workingTileID].instanceID] = null;
+      genContentSineWave[mediaContentTile[workingTileID].instanceID] = null;
       break;       
     case 12:  //"Dancing Bars"
-      genContentBars[sourceConentTile[workingTileID].instanceID] = null;
+      genContentBars[mediaContentTile[workingTileID].instanceID] = null;
       break;      
     case 13:  //"Template"    
 
       break;
     } //end switch
-    println("Successfully disposed a generated object with ID: "+sourceConentTile[workingTileID].generatedType);
+    println("Successfully disposed a generated object with ID: "+mediaContentTile[workingTileID].generatedType);
   }
   catch(Exception e) {
     println("Unable to dispose of previous generated object");
@@ -1814,7 +1812,7 @@ void DisposeGeneratedObjects()
 
   //might not yet be constructed
   try { 
-    sourceConentTile[workingTileID].generatedType = 0;   //reset this so it calls the 0/"null" generated object, preventing calls to the null/non-existent object
+    mediaContentTile[workingTileID].generatedType = 0;   //reset this so it calls the 0/"null" generated object, preventing calls to the null/non-existent object
   }
   catch(Exception e) {
   }

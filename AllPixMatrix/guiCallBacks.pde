@@ -1,4 +1,4 @@
- //<>// //<>// //<>// //<>//
+ //<>// //<>// //<>// //<>// //<>// //<>//
 //======================================================================================================
 
 void mainBlendModeFunc()
@@ -224,58 +224,76 @@ void feedIntensityFuncB()
 
 //======================================================================================================
 
-void generatedSourceContentFPSFunc()
+void generatedMediaFPSFunc()
 {
   genericNumberInputField(); 
-  sourceConentTile[workingTileID].contentFPS = (int)numberInputFieldPtr.value;
+  mediaContentTile[workingTileID].contentFPS = (int)numberInputFieldPtr.value;
 }
 
 //======================================================================================================
 
 void scaleOptionsDDFunc()
 {
-  sourceConentTile[workingTileID].scaleOption = imgScalingOptionsDD.getValue();
+  mediaContentTile[workingTileID].scaleOption = imgScalingOptionsDD.getValue();
 }
 
 //======================================================================================================
 
-void contentCropWFunc()
+void mediaCropWFunc()
 {
-  genericNumberInputField();
-  sourceConentTile[workingTileID].cropWidth = int(contentGUICropW.value);
+	mediaMenuGUICropW.maxValue = (mediaContentTile[workingTileID].nativeWidth - mediaContentTile[workingTileID].offsetX);
+	genericNumberInputField();
+	mediaContentTile[workingTileID].cropWidth = int(mediaMenuGUICropW.value);
 }
 
-void contentCropHFunc()
+void mediaCropHFunc()
 {
-  genericNumberInputField();
-  sourceConentTile[workingTileID].cropHeight = int(contentGUICropH.value);
+	mediaMenuGUICropH.maxValue = (mediaContentTile[workingTileID].nativeHeight - mediaContentTile[workingTileID].offsetY);
+	genericNumberInputField();
+	mediaContentTile[workingTileID].cropHeight = int(mediaMenuGUICropH.value);
 }
 
-void contentOffsetXFieldFunc()
+void mediaOffsetXFieldFunc()
 {
-  genericNumberInputField();
-  sourceConentTile[workingTileID].offsetX = int(contentOffsetX.value);
+	contentOffsetX.maxValue = mediaContentTile[workingTileID].nativeWidth; //set max offset, which is image width
+	genericNumberInputField();
+	mediaContentTile[workingTileID].offsetX = int(contentOffsetX.value);
+
+	//update companion field if required
+	if((mediaContentTile[workingTileID].nativeWidth - mediaContentTile[workingTileID].offsetX) < mediaContentTile[workingTileID].cropWidth)
+	{
+	mediaContentTile[workingTileID].cropWidth = (mediaContentTile[workingTileID].nativeWidth - mediaContentTile[workingTileID].offsetX);
+	mediaMenuGUICropW.setValue(mediaContentTile[workingTileID].cropWidth);
+	}
 }
 
-void contentOffsetYFieldFunc()
+void mediaOffsetYFieldFunc()
 {
-  genericNumberInputField();
-  sourceConentTile[workingTileID].offsetY = int(contentOffsetY.value);
+	contentOffsetY.maxValue = mediaContentTile[workingTileID].nativeHeight; //set max offset, which is image width
+	genericNumberInputField();
+	mediaContentTile[workingTileID].offsetY = int(contentOffsetY.value);
+
+	//update companion field if required
+	if((mediaContentTile[workingTileID].nativeHeight - mediaContentTile[workingTileID].offsetY) < mediaContentTile[workingTileID].cropHeight)
+	{
+	mediaContentTile[workingTileID].cropHeight = (mediaContentTile[workingTileID].nativeHeight - mediaContentTile[workingTileID].offsetY);
+	mediaMenuGUICropH.setValue(mediaContentTile[workingTileID].cropHeight);
+	}
 }
 
 //======================================================================================================
 
-void generatedSourceContentDDFunc()
+void generatedMediaDDFunc()
 {
-  println("generatedSourceContentDDFunc() using ID#: "+workingTileID);
+  println("generatedMediaDD() using ID#: "+workingTileID);
 
-  //if currently a generated source content, dispose the object so it can be reused in the future
+  //if currently a generated media content, dispose the object so it can be reused in the future
   DisposeGeneratedObjects();
 
-  sourceConentTile[workingTileID].generatedType = generatedSourceContentDD.getValue();
-  sourceConentTile[workingTileID].loadSourceContent(5); //5= ID for generated content
+  mediaContentTile[workingTileID].generatedType = generatedMediaDD.getValue();
+  mediaContentTile[workingTileID].loadMediaSource(5); //5= ID for generated content
   guiOverlayMenus[OverlayMenuID].initMenu(); //this will intialize the locations of the GUI elements, since they will change
-  sourceConentTile[workingTileID].updateContent();
+  mediaContentTile[workingTileID].updateMedia();
 }
 
 //======================================================================================================
@@ -399,8 +417,8 @@ void deselectTextField()
 void fileSelectDataFile(File selection)
 {
   if (!validateFileDialogSelection(selection)) return;
-  println("fileSelectDataile()");
-  createSourceContentTile("Data File "+workingTileID, cTypeIDDataFile, 0, SelectedFilePath); //create new object if adding
+  println("fileSelectDataFile()");
+  createMediaContentObj("Data File "+workingTileID, cTypeIDDataFile, 0, SelectedFilePath); //create new object if adding
   guiOverlayMenus[OverlayMenuID].initMenu(); //the GUI elements for the generated content are initialized here, so just run it
 } //end func
 
@@ -410,7 +428,7 @@ void fileSelectVideoFile(File selection)
 {
   if (!validateFileDialogSelection(selection)) return;
   println("fileSelectVideoFile()");
-  createSourceContentTile("Video "+workingTileID, cTypeIDVideo, 0, SelectedFilePath); //create new object if adding
+  createMediaContentObj("Video "+workingTileID, cTypeIDVideo, 0, SelectedFilePath); //create new object if adding
   guiOverlayMenus[OverlayMenuID].initMenu(); //now that the type is selected, init the menu so elements display properly
 } //end func
 
@@ -420,18 +438,29 @@ void fileSelectImageFile(File selection)
 {
   if (!validateFileDialogSelection(selection)) return;
   println("fileSelectImageFile()");
-  createSourceContentTile("Image "+workingTileID, cTypeIDImage, 0, SelectedFilePath); //create new object if adding
+  createMediaContentObj("Image "+workingTileID, cTypeIDImage, 0, SelectedFilePath); //create new object if adding
   guiOverlayMenus[OverlayMenuID].initMenu(); //now that the type is selected, init the menu so elements display properly
 } //end func
 
 //======================================================================================================
 
-void menuSourceConentButtonsFunc(int passedID)
+//Doesn't work casues errors, think it is because selectInput() is a thread
+void fileSelectContentFile(File selection)
 {
+  if (!validateFileDialogSelection(selection)) return;
+  println("fileSelectContentFile()"); 
+  LoadUserContentFile(SelectedFilePath);	//SelectedFilePath was updated by validateFileDialogSelection()
+}
+
+//======================================================================================================
+
+void menuMediaTileMenuButtonsFunc(int passedID)
+{
+  println("menuMediaTileMenuButtonsFunc() with "+passedID);
+	
   switch(passedID) //this is the button object id number, not the typeID
   {
   case 0: //video
-    // FileBrowserAction = 1; //set callback ID to load video file
     selectInput("Select MOV, AVI, or similar:", "fileSelectVideoFile");  
     break;
 
@@ -440,38 +469,35 @@ void menuSourceConentButtonsFunc(int passedID)
     break;
 
   case 2: //Image
-    //FileBrowserAction = 2; //set callback ID to load image
     selectInput("Select JPG, GIF, PNG, TIFF, or similar:", "fileSelectImageFile");  
     break;
 
   case 3: //Syphon/Spout
     //don't really want to create the spout receiver before selection of sender, but no other option since can't detect a selectSender() cancel
-    createSourceContentTile("Spout "+workingTileID, cTypeIDSpout, 0, ""); //create new object if adding
+    createMediaContentObj("Spout "+workingTileID, cTypeIDSpout, 0, ""); //create new object if adding
+	guiOverlayMenus[OverlayMenuID].initMenu();
     break;  
 
   case 4: //Generated
-    createSourceContentTile("Generated "+workingTileID, cTypeIDGenerated, 0, ""); //create new object if adding
+    createMediaContentObj("Generated "+workingTileID, cTypeIDGenerated, 0, ""); //create new object if adding
     guiOverlayMenus[OverlayMenuID].initMenu(); //the GUI elements for the generated content are initialized here, so just run it
     break;
 
   case 5: //Data File
-  //  createSourceContentTile("Data File "+workingTileID, cTypeIDDataFile, 0, ""); //create new object if adding
-  //  guiOverlayMenus[OverlayMenuID].initMenu(); //the GUI elements for the generated content are initialized here, so just run it
     selectInput("Select Recorded File, TXT", "fileSelectDataFile");  
     break;
 
   case 6: //External Data
-    createSourceContentTile("ExternalData "+workingTileID, cTypeIDExtData, 0, ""); //create new object if adding
+    createMediaContentObj("ExternalData "+workingTileID, cTypeIDExtData, 0, ""); //create new object if adding
     guiOverlayMenus[OverlayMenuID].initMenu(); //the GUI elements for the generated content are initialized here, so just run it
     break;
   } //end switch
 
 
-  for (int i = 0; i != menuSourceConentButtons.length; i++)
+  for (int i = 0; i != menuMediaTileMenuButtons.length; i++)
   {
-    menuSourceConentButtons[i].selected = false;
+    menuMediaTileMenuButtons[i].selected = false;
   } //end for()
-
 
   //in case it was a generated that was changed, this gets rid of the object and opens the slot
   DisposeGeneratedObjects();
@@ -486,9 +512,13 @@ void mainIntensityFunc()
 
 //======================================================================================================
 
-void sourceContentSliderFunc()
+void mediaContentSliderFunc()
 {
-  //  println("sourceContentSliderFunc()");
+  if(DefinedMediaTiles <= cSoftwareMaxViewedTiles-2)  mediaContentScrollBar.max = 0;
+  else mediaContentScrollBar.max = DefinedMediaTiles-cSoftwareMaxViewedTiles+1;
+  
+  if(mediaContentScrollBar.max >= (cSoftwareMaxMediaTiles-cSoftwareMaxViewedTiles)) mediaContentScrollBar.max = cSoftwareMaxMediaTiles-cSoftwareMaxViewedTiles-1; //limit to max tiles 
+  //println("mediaContentSliderFunc() "+mediaContentScrollBar.max);
 }
 
 //======================================================================================================

@@ -1,23 +1,36 @@
 
 //======================================================================================================
 
-void createSourceContentTile(String passedStr, int passedTypeID, int passedGenType, String passedFilePath)
+void createMediaContentObj(String passedStr, int passedTypeID, int passedGenType, String passedFilePath)
 {
-  println("createSourceContentTile() "+workingTileID+"   "+DefinedContentSources);
+  println("createMediaContentObj() "+passedTypeID+"   "+workingTileID+"   "+DefinedMediaTiles);
 
-  SelectedFilePath = passedFilePath; //required for loadSourceContent();
+  SelectedFilePath = passedFilePath; //required for loadMediaSource();
 
-  println("starting with "+SelectedFilePath); 
+  /*
+  //changes file path from absolute to relative, not needed as of now
+  if(passedTypeID != 0 && passedTypeID != cTypeIDGenerated && passedTypeID != cTypeIDSpout)
+  {
+  //if media type uses a file path, print it out and edit the file path
+  println("Starting with path "+SelectedFilePath); 
   //if (matrix.footageFilePathMethod == false) 
   SelectedFilePath = SelectedFilePath.replace(sketchPath(""), ""); //create relative path
   //else absolute
-  println("Ending with "+SelectedFilePath);
-
-  sourceConentTile[workingTileID] = new SourceContentTile(passedStr, workingTileID);
-  sourceConentTile[workingTileID].generatedType = passedGenType; //must be set before loadSourceContent()
-  sourceConentTile[workingTileID].loadSourceContent(passedTypeID); //loads and intializes the content
-
-  if (workingTileID > DefinedContentSources) DefinedContentSources++; //keeps global count
+  println("Using path "+SelectedFilePath);
+  }
+  */
+  
+  mediaContentTile[workingTileID] = new mediaContentObj(passedStr, workingTileID);
+  mediaContentTile[workingTileID].generatedType = passedGenType; //must be set before loadMediaSource()
+  mediaContentTile[workingTileID].loadMediaSource(passedTypeID); //loads and intializes the content
+  
+  if (workingTileID > DefinedMediaTiles) 
+  {  
+  DefinedMediaTiles++; //keeps global count, only increment if a new media tile. Rather than redefining
+  //Since a media tile was added adjust media tiles scroll bar. Don't like this way but is quick and easy
+  mediaContentSliderFunc(); //run call back that adjust the max value
+  mediaContentScrollBar.value = mediaContentScrollBar.max; //set to max so user sees the add button
+  }
 }
 
 //======================================================================================================
@@ -55,12 +68,12 @@ String StatusMessage()
 //======================================================================================================
 
 //Since the object is not yet created this will see if it is available or direct it to the NULL contentTile until loadSource is ran
-int getSourceContentTileTypeID()
+int getmediaContentObjTypeID()
 {
   int temp = 0;
 
   try {
-    temp = sourceConentTile[workingTileID].typeID;
+    temp = mediaContentTile[workingTileID].typeID;
   }
   catch(Exception e)
   {
@@ -87,7 +100,8 @@ void handleEffectsFilterElements(int passedVal)
     effectsFilterInputField.minValue = 0;
     effectsFilterInputField.value = 0.5;
     effectsFilterInputField.label = ""+effectsFilterInputField.value;
-  } else if (cFilterIDStr[passedVal] == POSTERIZE)
+  } 
+  else if (cFilterIDStr[passedVal] == POSTERIZE)
   {
     effectsFilterInputField.status = 0;//0=show, 1=grey out, 2=hide
     effectsFilterInputField.inputMethod = 1; //integers
@@ -108,9 +122,10 @@ void handleEffectsFilterElements(int passedVal)
 
 //======================================================================================================
 
+//Selects a media tile to place into layer
 void FillContentLayer(int passedVal)
 {
-  contentLayerPtr.loadContentToLayer(passedVal);
+  contentLayerPtr.loadMediaToLayer(passedVal);
   SelectFeedID = 0; //clear as it indicates function
 } //end func
 
@@ -186,7 +201,7 @@ void OpenOverlayMenu(int passedID, int passedArgument1)
   OverlayMenuID = passedID;
   //what else to do?
 
-  if (passedID == cOverlaySourceContent)
+  if (passedID == cOverlayMediaTileMenu)
   {
     workingTileID = passedArgument1;
   } //end if()
@@ -202,32 +217,33 @@ void OpenOverlayMenu(int passedID, int passedArgument1)
 
 //======================================================================================================
 
-void displaySourceContentTiles()
+void displayMediaTiles()
 {
 
   try {
-    for (int i=1; i != sourceConentTile.length; i++) 
+    //for (int i=1; i != mediaContentTile.length; i++) 
+    for (int i=1; i != (DefinedMediaTiles+1)-mediaContentScrollBar.value; i++) 
     {
-
-      sourceConentTile[i+sourceContentScrollBar.getValue()].display(10+((i-1)*90), 655); //starts at tile #1
+      mediaContentTile[i+mediaContentScrollBar.getValue()].display(10+((i-1)*90), 655); //starts at tile #1
     } //end for
   }
   catch(Exception e) {
+	//println("Problem with content tiles");
   }
 
   //These buttons are never shown but are used for over() detection
-  //for (int i=0; i != contentSelectionButtons.length; i++) contentSelectionButtons[i].display();
+  //for (int i=0; i != mediaTileSelectionButtons.length; i++) mediaTileSelectionButtons[i].display();
 
   //Displays the (+) add Source button to the tile area
-  if ((DefinedContentSources-sourceContentScrollBar.value) < contentSelectionButtons.length)
+  if ((DefinedMediaTiles-mediaContentScrollBar.value) < mediaTileSelectionButtons.length)
   {
-    if ((DefinedContentSources-sourceContentScrollBar.value) >= 0)
+    if ((DefinedMediaTiles-mediaContentScrollBar.value) >= 0)
     {
-      //println("VALUE IS: "+DefinedContentSources+"   "+sourceContentScrollBar.Value+"   "+contentSelectionButtons.length);
-      contentSelectionButtons[(DefinedContentSources)-sourceContentScrollBar.value].display();
+      //println("VALUE IS: "+DefinedMediaTiles+"   "+mediaContentScrollBar.Value+"   "+mediaTileSelectionButtons.length);
+      mediaTileSelectionButtons[(DefinedMediaTiles)-mediaContentScrollBar.value].display();
     }
   }
-} //end displaySourceContentTiles()
+} //end displayMediaTiles()
 
 //======================================================================================================
 
@@ -244,3 +260,40 @@ void stop()
 }
 
 //======================================================================================================
+
+void SetFeedAPausePlay(int passedVal)
+{
+	println("SetFeedAPausePlay("+passedVal+")");
+	FeedPlayModeA = passedVal;
+	mediaContentTile[contentLayerA[0].mediaIDNum].setPlayMode(passedVal);
+	mediaContentTile[contentLayerA[1].mediaIDNum].setPlayMode(passedVal);
+	mediaContentTile[contentLayerA[2].mediaIDNum].setPlayMode(passedVal);
+	
+	//update layer play/pause GUI elements - this could be done somewhere better
+	for (int i = 0; i != feedLayersPlayPauseA.length; i++)
+	{
+	if (mediaContentTile[contentLayerA[i].mediaIDNum].playMode == 0) feedLayersPlayPauseA[i].selected = false;
+	else feedLayersPlayPauseA[i].selected = true;
+	} //end for	
+}
+
+//======================================================================================================
+
+void SetFeedBPausePlay(int passedVal)
+{
+	println("SetFeedBPausePlay("+passedVal+")");
+	FeedPlayModeB = passedVal;
+	mediaContentTile[contentLayerB[0].mediaIDNum].setPlayMode(passedVal);
+	mediaContentTile[contentLayerB[1].mediaIDNum].setPlayMode(passedVal);
+	mediaContentTile[contentLayerB[2].mediaIDNum].setPlayMode(passedVal);
+	
+	//update layer play/pause GUI elements - this could be done somewhere better
+	for (int i = 0; i != feedLayersPlayPauseA.length; i++)
+	{
+	if (mediaContentTile[contentLayerB[i].mediaIDNum].playMode == 0) feedLayersPlayPauseB[i].selected = false;
+	else feedLayersPlayPauseB[i].selected = true;
+	} //end for	
+}
+//======================================================================================================
+
+

@@ -3,6 +3,17 @@
 
 void keyPressed()
 {
+	
+//------------------------------------------------------------------------------------------------
+
+  if (key == ESC) //overide ESC
+  {
+    println("Escape key disabled");
+    deselectTextField();
+    CloseOverLayMenu();
+    key = 0; //have to alter it or if it gets to the end of the function with key=escape it closes the application
+    return; //double up preventing escape for closing application
+  }
 
   //------------------------------------------------------------------------------------------------
 
@@ -33,7 +44,8 @@ void keyPressed()
       if ((byte)key > 0 && (byte)key < 127) numberInputFieldPtr.label =  ""+numberInputFieldPtr.label + char(key);
       else println("KEY IGNORED"); //DEBUG
       return;
-    } else
+    } 
+    else
     {
       if (key=='1' || key== '2' || key=='3' || key=='4' || key=='5' || key=='6' || key=='7' || key=='8' || key=='9' || key=='0' || key=='-' || (key =='.' && numberInputFieldPtr.inputMethod == 3))
       {
@@ -92,28 +104,7 @@ void keyPressed()
     return;
   }  //end NumberInputFieldActive if()
 
-
   //------------------------------------------------------------------------------------------------
-/*
-
-  if (key == '1')  sourceConentTile[workingTileID].offsetX+=10;
-  if (key == '2')  sourceConentTile[workingTileID].offsetY+=10;
-  if (key == '3')  sourceConentTile[workingTileID].cropWidth-=10;
-  if (key == '4')  sourceConentTile[workingTileID].cropHeight-=10;  
-  if (key == '5') 
-*/
-//  if (key == 'x')  PrintDebugMessages = !PrintDebugMessages;
-//  if (key == 'i') 
-
-
-  if (key == ESC) //overide ESC
-  {
-    println("Escape key disabled");
-    deselectTextField();
-    CloseOverLayMenu();
-    key = 0; //have to alter it or if it gets to the end of the function with key=escape it closes the application
-    return; //double up preventing escape for closing application
-  }
 
 try { //if not yet selected these codes could error
   if (key == CODED) 

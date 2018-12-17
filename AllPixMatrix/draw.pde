@@ -1,12 +1,13 @@
-void draw() {
-
+void draw() 
+{
+	
   // --------------------------------------------------- Handle GUI Refresh ------------------------------------------------------------------
 
   guiRefreshMs++; //increment counter
 
   if (guiRefreshMs > software.frameRateMs)
   {
-    guiRefreshMs = 0; //if matches, refresh the GUI and clear the counter
+    guiRefreshMs = 0; //if timers match, refresh the GUI and clear the counter
 
     //update in case of slider or other gui features
     mouseXS = round((float)mouseX / SF); //update scaled mouseX & Y, allows window resizing to work
@@ -50,12 +51,12 @@ void draw() {
     for (int i=0; i != contentLayerA.length; i++) contentLayerA[i].display();
     for (int i=0; i != contentLayerB.length; i++) contentLayerB[i].display();
 
-    if (SelectFeedID == 1) layerAtileButtons[SelectLayerID].displayOutline();       //displays box to indicate selected layer
-    else if (SelectFeedID == 2) layerBtileButtons[SelectLayerID].displayOutline();  //displays box to indicate selected layer
+    if (SelectFeedID == 1) feedLayersTileButtonsA[SelectLayerID].displayOutline();       //displays box to indicate selected layer
+    else if (SelectFeedID == 2) feedLayersTileButtonsB[SelectLayerID].displayOutline();  //displays box to indicate selected layer
 
-    displaySourceContentTiles();
+    displayMediaTiles();
 
-    sourceContentScrollBar.display();
+    mediaContentScrollBar.display();
 
     mainCrossFader.display();
     mainIntensityFader.display();
@@ -92,7 +93,8 @@ void draw() {
     // --------------------------------------------------- Display Image Previews ---------------------------------------------------
 
 
-    //-------------------------------------- Display Pixelated GUI Previews ----------------------------------------------------------------
+	
+    // -------------------------------------- Display Pixelated GUI Previews ----------------------------------------------------------------
 
     //if(transmitPixelBuffer == null) transmitPixelBuffer = MixedContentGBuf.get(); //errors without this
 
@@ -106,14 +108,14 @@ void draw() {
       {
         color pix = transmitPixelBuffer.get(PatchCoordX[i], PatchCoordY[i]);
         fill(pix);
-        rect(465+(PatchCoordX[i]*displayPixSize), 10+(PatchCoordY[i]*displayPixSize), displayPixSize, displayPixSize);
+        rect(465+displayOffsetX+(PatchCoordX[i]*displayPixSize), 10+displayOffsetY+(PatchCoordY[i]*displayPixSize), displayPixSize, displayPixSize);
       }
     }
     catch(Exception e) {
     }
 
-    feedPreviewImgA = SourceContentGBufA.get(); //quicker to convert the PGraphics to PImage before running .get() it seems,
-    feedPreviewImgB = SourceContentGBufB.get(); //distinctly noticable when fading back and fourth
+    feedPreviewImgA = LayerContentGBufA.get(); //quicker to convert the PGraphics to PImage before running .get() it seems,
+    feedPreviewImgB = LayerContentGBufB.get(); //distinctly noticable when fading back and fourth
 
     //Feed A preview
     for (int i = 0; i < feedPreviewImgA.width; i++)//=pixSize)
@@ -122,7 +124,7 @@ void draw() {
       {
         color pix = feedPreviewImgA.get(i, j);
         fill(pix);
-        rect(10+(i*displayPixSize), 10+(j*displayPixSize), displayPixSize, displayPixSize);
+        rect(10+displayOffsetX+(i*displayPixSize), 10+displayOffsetY+(j*displayPixSize), displayPixSize, displayPixSize);
       }
     }
 
@@ -133,7 +135,7 @@ void draw() {
       {
         color pix = feedPreviewImgB.get(i, j);
         fill(pix);
-        rect(920+(i*displayPixSize), 10+(j*displayPixSize), displayPixSize, displayPixSize);
+        rect(920+displayOffsetX+(i*displayPixSize), 10+displayOffsetY+(j*displayPixSize), displayPixSize, displayPixSize);
       }
     }
 
@@ -154,8 +156,8 @@ void draw() {
 
     /*
     //Disable for now, but really want this to work - if transmit a syphon, and the software that created it receives it, errors occur.
-     spoutSenderA.sendTexture(SourceContentGBufA);
-     spoutSenderB.sendTexture(SourceContentGBufB);
+     spoutSenderA.sendTexture(LayerContentGBufA);
+     spoutSenderB.sendTexture(LayerContentGBufB);
      spoutSenderMixed.sendTexture(MixedContentGBuf);
      */
 
@@ -175,36 +177,37 @@ void draw() {
 
   // --------------------------------------------------- End GUI Refresh ------------------------------------------------------------------
 
-  //Content must be updated from draw, most cases it can draw to PGraphics without error, but not all the time. Depends on renderer, P3D for sure won't work if drawn from outside draw()
-  //otherwise this would be a background thread. There may be a method to thread updateContent() but not that I know of as of now.
+  //Content must be updated from draw, most cases it can draw to PGraphics without error, but not all the time. Depends on renderer, P3D for sure 
+  //	won't work if drawn from outside draw() otherwise this would be a background thread. There may be a method to thread updateMedia() but not 
+  //	that I know of as of now. The remainder of draw() is what requires the framerate to be 1000 for 1mS timing. Each media tile has it's own
+  //	framerate that it needs to update at. This is required so actual play back speeds of the media does not vary between software gui
 
+  //The following updateMedia() is the timing source for the generated media
+  
   //------------------------------------------------ Feed A Content Update ----------------------------------------------------------------
 
   try {
-    if (FeedPlayModeA == 0)
-    {
-      if ((millis()-sourceConentTile[contentLayerA[0].contentIDNum].holdMillis) > contentLayerA[0].getMsUpdateVal())
+      if ((millis()-mediaContentTile[contentLayerA[0].mediaIDNum].holdMillis) > contentLayerA[0].getMsUpdateVal())
       {
-        if (sourceConentTile[contentLayerA[0].contentIDNum].playMode == 0)
+        if (mediaContentTile[contentLayerA[0].mediaIDNum].playMode == 0)
         {
-          sourceConentTile[contentLayerA[0].contentIDNum].holdMillis = millis();
-          sourceConentTile[contentLayerA[0].contentIDNum].updateContent();
+          mediaContentTile[contentLayerA[0].mediaIDNum].holdMillis = millis();
+          mediaContentTile[contentLayerA[0].mediaIDNum].updateMedia();
           mixFeeds = true;
         }
       }
-      if ((millis()-sourceConentTile[contentLayerA[1].contentIDNum].holdMillis) > contentLayerA[1].getMsUpdateVal())
+      if ((millis()-mediaContentTile[contentLayerA[1].mediaIDNum].holdMillis) > contentLayerA[1].getMsUpdateVal())
       {
-        sourceConentTile[contentLayerA[1].contentIDNum].holdMillis = millis();
-        sourceConentTile[contentLayerA[1].contentIDNum].updateContent();
+        mediaContentTile[contentLayerA[1].mediaIDNum].holdMillis = millis();
+        mediaContentTile[contentLayerA[1].mediaIDNum].updateMedia();
         mixFeeds = true;
       }
-      if ((millis()-sourceConentTile[contentLayerA[2].contentIDNum].holdMillis) > contentLayerA[2].getMsUpdateVal())
+      if ((millis()-mediaContentTile[contentLayerA[2].mediaIDNum].holdMillis) > contentLayerA[2].getMsUpdateVal())
       {
-        sourceConentTile[contentLayerA[2].contentIDNum].holdMillis = millis();
-        sourceConentTile[contentLayerA[2].contentIDNum].updateContent();
+        mediaContentTile[contentLayerA[2].mediaIDNum].holdMillis = millis();
+        mediaContentTile[contentLayerA[2].mediaIDNum].updateMedia();
         mixFeeds = true;
       }
-    }
   }
   catch(Exception e) { 
     println("FeedA had an error");
@@ -214,48 +217,46 @@ void draw() {
 
   try
   {
-    if (FeedPlayModeB == 0)
-    {
-      if ((millis()-sourceConentTile[contentLayerB[0].contentIDNum].holdMillis) > contentLayerB[0].getMsUpdateVal())
+      if ((millis()-mediaContentTile[contentLayerB[0].mediaIDNum].holdMillis) > contentLayerB[0].getMsUpdateVal())
       {
-        sourceConentTile[contentLayerB[0].contentIDNum].holdMillis = millis();
-        sourceConentTile[contentLayerB[0].contentIDNum].updateContent();
+        mediaContentTile[contentLayerB[0].mediaIDNum].holdMillis = millis();
+        mediaContentTile[contentLayerB[0].mediaIDNum].updateMedia();
         mixFeeds = true;
       }
-      if ((millis()-sourceConentTile[contentLayerB[1].contentIDNum].holdMillis) > contentLayerB[1].getMsUpdateVal())
+      if ((millis()-mediaContentTile[contentLayerB[1].mediaIDNum].holdMillis) > contentLayerB[1].getMsUpdateVal())
       {
-        sourceConentTile[contentLayerB[1].contentIDNum].holdMillis = millis();
-        sourceConentTile[contentLayerB[1].contentIDNum].updateContent();
+        mediaContentTile[contentLayerB[1].mediaIDNum].holdMillis = millis();
+        mediaContentTile[contentLayerB[1].mediaIDNum].updateMedia();
         mixFeeds = true;
       }
-      if ((millis()-sourceConentTile[contentLayerB[2].contentIDNum].holdMillis) > contentLayerB[2].getMsUpdateVal())
+      if ((millis()-mediaContentTile[contentLayerB[2].mediaIDNum].holdMillis) > contentLayerB[2].getMsUpdateVal())
       {
-        sourceConentTile[contentLayerB[2].contentIDNum].holdMillis = millis();
-        sourceConentTile[contentLayerB[2].contentIDNum].updateContent();
+        mediaContentTile[contentLayerB[2].mediaIDNum].holdMillis = millis();
+        mediaContentTile[contentLayerB[2].mediaIDNum].updateMedia();
         mixFeeds = true;
       }
-    }
   }
   catch(Exception e) { 
     println("FeedB had an error");
   } 
 
-  if (FeedPlayModeA == 1 && FeedPlayModeB == 1) mixFeeds = true; //if both are paused, still need to mix them
+ //if (FeedPlayModeA == 1 && FeedPlayModeB == 1) mixFeeds = true; //if both feeds are paused, still need to mix them for the output
 
   //------------------------------------------------ Feeds Updated, Now Mix Them ----------------------------------------------------------------
 
-  //If any sourceContent has changed and the output FPS timer has elapsed, indicate to the transmission thread to send a packet
+  //If any media content has changed and the output FPS timer has elapsed, indicate to the transmission thread to send a packet
   if (mixFeeds == true)
   {
     if ((millis()-holdMillis) > matrix.outputFPS)
     {
-      //  println("mixed "+(millis()-holdMillis));
-      holdMillis = millis();
+      //println("mixed "+(millis()-holdMillis));
+      //holdMillis = millis();
 
       mixFeeds = false;
-      //now mix 
+      //now mix the layers
       MainMixFunction(); //mix FeedA and FeedB
       transmitPixelBuffer = MixedContentGBuf.get();
+      //holdMillis = millis(); //update here
       PacketReadyForTransmit = true; //indicates to transmission thread that a new frame is ready
     }
   } //end mixFeeds if()
@@ -265,134 +266,126 @@ void draw() {
 
 void MainMixFunction()
 {
-  //only call from draw() 
+  //only call from draw() otherwise creates graphical glitches
+  //This function uses a PImage or PGraphics buffer for both Feeds(A&B), the mixed buffer. A scratch buffer is used to copy the
+  //	the mediaTile's graphic buffer, the media images are layered an to create the mixed layer image.
+  //	The mixed layer image
 
+  
   // --------------------------------------------------- Mix Side A ------------------------------------------------------------------
 
-  SourceContentGBufA.beginDraw();
-  SourceContentGBufA.background(0, 0, 0, 0); //required... for now anyway, needed for tint to work
-  SourceContentGBufA.endDraw();
+  LayerContentGBufA.beginDraw();
+  LayerContentGBufA.background(0, 0, 0, 0); //clears the layer graphic buffer with transparency(required for tint())
+  LayerContentGBufA.endDraw();
 
   //----------------------------------------- Feed A, Bottom Layer ----------------------------------------------------
 
-  //without the .get() the filter effects the source content
-  if (sourceConentTile[contentLayerA[2].contentIDNum].typeID == cTypeIDGenerated || sourceConentTile[contentLayerA[2].contentIDNum].typeID == 10) scratchImg = sourceConentTile[contentLayerA[2].contentIDNum].thumbnailImg.get(); //no cropping/resize
-  else scratchImg = sourceConentTile[contentLayerA[2].contentIDNum].thumbnailImg.get(sourceConentTile[contentLayerA[2].contentIDNum].offsetX, sourceConentTile[contentLayerA[2].contentIDNum].offsetY, sourceConentTile[contentLayerA[2].contentIDNum].cropWidth, sourceConentTile[contentLayerA[2].contentIDNum].cropHeight); 
+  contentLayerA[2].updateLayerFrame();
 
   scratchGBuf.beginDraw();
   scratchGBuf.background(0, 0, 0, 0); //required... for now anyway, needed for tint to work
   scratchGBuf.tint(255, contentLayerA[2].layerOpacity);  //Opacity 3rd Layery
-  MixingCommonScaleFunc(sourceConentTile[contentLayerA[2].contentIDNum].scaleOption);
+  MixingCommonScaleFunc(mediaContentTile[contentLayerA[2].mediaIDNum].scaleOption);
   MixingCommonApplyEffects(contentLayerA[2].effectFilterIDNum, contentLayerA[2].effectFilterVariable);
   scratchGBuf.endDraw();
 
-  SourceContentGBufA.beginDraw();
-  SourceContentGBufA.blendMode(cBlendID[contentLayerA[2].blendMode]);
+  LayerContentGBufA.beginDraw();
+  LayerContentGBufA.blendMode(cBlendID[contentLayerA[2].blendMode]);
   MixingCommonApplyColorEffects(contentLayerA[2]);
-  SourceContentGBufA.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
-  SourceContentGBufA.endDraw();
+  LayerContentGBufA.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
+  LayerContentGBufA.endDraw();
 
   //--------------------------------------------- Feed A, Middle Layer ------------------------------------------------
 
-  //without the .get() the filter effects the source content
-  if (sourceConentTile[contentLayerA[1].contentIDNum].typeID == cTypeIDGenerated || sourceConentTile[contentLayerA[1].contentIDNum].typeID == 10) scratchImg = sourceConentTile[contentLayerA[1].contentIDNum].thumbnailImg.get(); //do not crop
-  else scratchImg = sourceConentTile[contentLayerA[1].contentIDNum].thumbnailImg.get(sourceConentTile[contentLayerA[1].contentIDNum].offsetX, sourceConentTile[contentLayerA[1].contentIDNum].offsetY, sourceConentTile[contentLayerA[1].contentIDNum].cropWidth, sourceConentTile[contentLayerA[1].contentIDNum].cropHeight);  
-
+  contentLayerA[1].updateLayerFrame();
+  
   scratchGBuf.beginDraw();
   scratchGBuf.background(0, 0, 0, 0); //required... for now anyway, needed for tint to work
   scratchGBuf.tint(255, contentLayerA[1].layerOpacity);  //Opacity 2nd Layer
-  MixingCommonScaleFunc(sourceConentTile[contentLayerA[1].contentIDNum].scaleOption);
+  MixingCommonScaleFunc(mediaContentTile[contentLayerA[1].mediaIDNum].scaleOption);
   MixingCommonApplyEffects(contentLayerA[1].effectFilterIDNum, contentLayerA[1].effectFilterVariable);
   scratchGBuf.endDraw();
 
-  SourceContentGBufA.beginDraw();
-  SourceContentGBufA.blendMode(cBlendID[contentLayerA[1].blendMode]);
+  LayerContentGBufA.beginDraw();
+  LayerContentGBufA.blendMode(cBlendID[contentLayerA[1].blendMode]);
   MixingCommonApplyColorEffects(contentLayerA[1]);
-  SourceContentGBufA.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
-  SourceContentGBufA.endDraw();
+  LayerContentGBufA.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
+  LayerContentGBufA.endDraw();
 
   //-------------------------------------------- Feed A, Top Layer -------------------------------------------------
 
-  //without the .get() the filter effects the source content
-  if (sourceConentTile[contentLayerA[0].contentIDNum].typeID == cTypeIDGenerated || sourceConentTile[contentLayerA[0].contentIDNum].typeID == 10) scratchImg = sourceConentTile[contentLayerA[0].contentIDNum].thumbnailImg.get();
-  else scratchImg = sourceConentTile[contentLayerA[0].contentIDNum].thumbnailImg.get(sourceConentTile[contentLayerA[0].contentIDNum].offsetX, sourceConentTile[contentLayerA[0].contentIDNum].offsetY, sourceConentTile[contentLayerA[0].contentIDNum].cropWidth, sourceConentTile[contentLayerA[0].contentIDNum].cropHeight);  
-
+  contentLayerA[0].updateLayerFrame();
+  
   scratchGBuf.beginDraw();
   scratchGBuf.background(0, 0, 0, 0); //required... for now anyway, needed for tint to work
   scratchGBuf.tint(255, contentLayerA[0].layerOpacity);  //Opacity 1st Layer
-  MixingCommonScaleFunc(sourceConentTile[contentLayerA[0].contentIDNum].scaleOption);
+  MixingCommonScaleFunc(mediaContentTile[contentLayerA[0].mediaIDNum].scaleOption);
   MixingCommonApplyEffects(contentLayerA[0].effectFilterIDNum, contentLayerA[0].effectFilterVariable);
   scratchGBuf.endDraw();
 
-  SourceContentGBufA.beginDraw();
-  SourceContentGBufA.blendMode(cBlendID[contentLayerA[0].blendMode]);
+  LayerContentGBufA.beginDraw();
+  LayerContentGBufA.blendMode(cBlendID[contentLayerA[0].blendMode]);
   MixingCommonApplyColorEffects(contentLayerA[0]);
-  SourceContentGBufA.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
-  SourceContentGBufA.endDraw();
+  LayerContentGBufA.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
+  LayerContentGBufA.endDraw();
 
   // --------------------------------------------------- Mix Side B ---------------------------------------------------
 
-  SourceContentGBufB.beginDraw();
-  SourceContentGBufB.background(0, 0, 0, 0); //required... for now anyway, needed for tint to work
-  SourceContentGBufB.endDraw();
+  LayerContentGBufB.beginDraw();
+  LayerContentGBufB.background(0, 0, 0, 0); //clears the layer graphic buffer with transparency(required for tint())
+  LayerContentGBufB.endDraw();
 
   //----------------------------------------------- Feed B, Top Layer ----------------------------------------------
 
-  //without the .get() the filter effects the source content
-  if (sourceConentTile[contentLayerB[2].contentIDNum].typeID == cTypeIDGenerated || sourceConentTile[contentLayerB[2].contentIDNum].typeID == 10) scratchImg = sourceConentTile[contentLayerB[2].contentIDNum].thumbnailImg.get();
-  else scratchImg = sourceConentTile[contentLayerB[2].contentIDNum].thumbnailImg.get(sourceConentTile[contentLayerB[2].contentIDNum].offsetX, sourceConentTile[contentLayerB[2].contentIDNum].offsetY, sourceConentTile[contentLayerB[2].contentIDNum].cropWidth, sourceConentTile[contentLayerB[2].contentIDNum].cropHeight);  
-
+  contentLayerB[2].updateLayerFrame();
+  
   scratchGBuf.beginDraw();
   scratchGBuf.background(0, 0, 0, 0); //required... for now anyway, needed for tint to work
   scratchGBuf.tint(255, contentLayerB[2].layerOpacity);  //Intensity 3rd Layer
-  MixingCommonScaleFunc(sourceConentTile[contentLayerB[2].contentIDNum].scaleOption);
+  MixingCommonScaleFunc(mediaContentTile[contentLayerB[2].mediaIDNum].scaleOption);
   MixingCommonApplyEffects(contentLayerB[2].effectFilterIDNum, contentLayerB[2].effectFilterVariable);
   scratchGBuf.endDraw();
 
-  SourceContentGBufB.beginDraw();
-  SourceContentGBufB.blendMode(cBlendID[contentLayerB[2].blendMode]);
+  LayerContentGBufB.beginDraw();
+  LayerContentGBufB.blendMode(cBlendID[contentLayerB[2].blendMode]);
   MixingCommonApplyColorEffects(contentLayerB[2]);
-  SourceContentGBufB.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
-  SourceContentGBufB.endDraw();
+  LayerContentGBufB.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
+  LayerContentGBufB.endDraw();
 
   //-------------------------------------------- Feed B, Middle Layer -------------------------------------------------
 
-  //without the .get() the filter effects the source content
-  if (sourceConentTile[contentLayerB[1].contentIDNum].typeID == cTypeIDGenerated || sourceConentTile[contentLayerB[1].contentIDNum].typeID == 10)  scratchImg = sourceConentTile[contentLayerB[1].contentIDNum].thumbnailImg.get();
-  else scratchImg = sourceConentTile[contentLayerB[1].contentIDNum].thumbnailImg.get(sourceConentTile[contentLayerB[1].contentIDNum].offsetX, sourceConentTile[contentLayerB[1].contentIDNum].offsetY, sourceConentTile[contentLayerB[1].contentIDNum].cropWidth, sourceConentTile[contentLayerB[1].contentIDNum].cropHeight);  
-
+  contentLayerB[1].updateLayerFrame();
+  
   scratchGBuf.beginDraw();
   scratchGBuf.background(0, 0, 0, 0); //required... for now anyway, needed for tint to work
   scratchGBuf.tint(255, contentLayerB[1].layerOpacity);  //Intensity 2nd Layer
-  MixingCommonScaleFunc(sourceConentTile[contentLayerB[1].contentIDNum].scaleOption);
+  MixingCommonScaleFunc(mediaContentTile[contentLayerB[1].mediaIDNum].scaleOption);
   MixingCommonApplyEffects(contentLayerB[1].effectFilterIDNum, contentLayerB[1].effectFilterVariable);
   scratchGBuf.endDraw();
 
 
-  SourceContentGBufB.beginDraw();
-  SourceContentGBufB.blendMode(cBlendID[contentLayerB[1].blendMode]);
+  LayerContentGBufB.beginDraw();
+  LayerContentGBufB.blendMode(cBlendID[contentLayerB[1].blendMode]);
   MixingCommonApplyColorEffects(contentLayerB[1]);
-  SourceContentGBufB.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
-  SourceContentGBufB.endDraw();
+  LayerContentGBufB.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
+  LayerContentGBufB.endDraw();
 
   //----------------------------------------- Feed B, Bottom Layer ----------------------------------------------------
 
-  //without the .get() the filter effects the source content
-  if (sourceConentTile[contentLayerB[0].contentIDNum].typeID == cTypeIDGenerated || sourceConentTile[contentLayerB[0].contentIDNum].typeID == 10)  scratchImg = sourceConentTile[contentLayerB[0].contentIDNum].thumbnailImg.get();
-  else scratchImg = sourceConentTile[contentLayerB[0].contentIDNum].thumbnailImg.get(sourceConentTile[contentLayerB[0].contentIDNum].offsetX, sourceConentTile[contentLayerB[0].contentIDNum].offsetY, sourceConentTile[contentLayerB[0].contentIDNum].cropWidth, sourceConentTile[contentLayerB[0].contentIDNum].cropHeight);   
-
+  contentLayerB[0].updateLayerFrame();
+  
   scratchGBuf.beginDraw();
   scratchGBuf.background(0, 0, 0, 0); //required... for now anyway, needed for tint to work
   scratchGBuf.tint(255, contentLayerB[0].layerOpacity);  //Intensity 2nd Layer
-  MixingCommonScaleFunc(sourceConentTile[contentLayerB[0].contentIDNum].scaleOption);
+  MixingCommonScaleFunc(mediaContentTile[contentLayerB[0].mediaIDNum].scaleOption);
   MixingCommonApplyEffects(contentLayerB[0].effectFilterIDNum, contentLayerB[0].effectFilterVariable);
   scratchGBuf.endDraw();
 
-  SourceContentGBufB.beginDraw();
-  SourceContentGBufB.blendMode(cBlendID[contentLayerB[0].blendMode]);
+  LayerContentGBufB.beginDraw();
+  LayerContentGBufB.blendMode(cBlendID[contentLayerB[0].blendMode]);
   MixingCommonApplyColorEffects(contentLayerB[0]);
-  SourceContentGBufB.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
-  SourceContentGBufB.endDraw();
+  LayerContentGBufB.image(scratchGBuf, 0, 0, scratchGBuf.width, scratchGBuf.height); //display content image
+  LayerContentGBufB.endDraw();
 
   // --------------------------------------------------- Final Mix ---------------------------------------------------
 
@@ -400,10 +393,10 @@ void MainMixFunction()
   MixedContentGBuf.background(0, 0, 0, 0); //clear graphics buffer
   MixedContentGBuf.noTint();
   MixedContentGBuf.tint(255, 255*(1-CrossFaderValue));
-  MixedContentGBuf.image(GraphicsBufferOpacity(FeedIntensityA, SourceContentGBufA), 0, 0);
+  MixedContentGBuf.image(GraphicsBufferOpacity(FeedIntensityA, LayerContentGBufA), 0, 0);
   MixedContentGBuf.blendMode(cBlendID[MainBlendMode]);
   MixedContentGBuf.tint(255, (255*CrossFaderValue));
-  MixedContentGBuf.image(GraphicsBufferOpacity(FeedIntensityB, SourceContentGBufB), 0, 0);
+  MixedContentGBuf.image(GraphicsBufferOpacity(FeedIntensityB, LayerContentGBufB), 0, 0);
 
   MixedContentGBuf.endDraw();
 } //end func
@@ -413,8 +406,6 @@ void MainMixFunction()
 //scales the image according to the set value
 void MixingCommonScaleFunc(int passedIDNum)
 {
-  //scratchGBuf.image(scratchImg, 0, 0); //display content image - no scaling or anything
-
   switch(passedIDNum)
   {
   case 0:

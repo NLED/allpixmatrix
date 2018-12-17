@@ -7,19 +7,82 @@ void loadMovieFile(int passedID, String passedFilePath)
 
 //==========================================================================================
 
-void OutputTransmissionThread() //threaded transmission
+void EstablishOutputConnection()
 {
-  println("SendPixelBuffer() thread started");
+	printArray(Serial.list());
 
-  color tempColor;
-  byte myRed, myGreen, myBlue;
-  int x = 0;
+  //loads external serial data input - such as glediator
+  matrix.externalDataRunning = false; //initialize false
 
-  delay(1000); //wait to start transmitting after thread is started
-
-  if (matrix.auroraCMD == true)
+  if (matrix.externalDataEnable == true) //trys to connect to the external datastream, from a serial port, virtual or physical
   {
+    //incase of a reconnection, make sure to close the port first
+    try {
+      externalSerialPort.stop();
+    }
+    catch(Exception e) { 
+      println("No External Data Port To Close");
+    }
+
+    //Resize this now or will error and disable the port when data starts being received
+    ExternalDataArray = new short[(matrix.width * matrix.height) * 3];  //comes in full size, no patch yet. 3 is for RGB - needs update for single or RGBW
+
+    try {
+      ExternalDataCounter = 0; //reset variable incase of reconnection
+      ExternalDataFramed = false;  //reset variable incase of reconnection
+
+      externalSerialPort = new Serial(this, Serial.list()[matrix.externalDataPort], matrix.externalDataBaud);
+      println("externalDataSerialPort opened "+Serial.list()[matrix.externalDataPort]+" at "+matrix.externalDataBaud+" baud.");
+      matrix.externalDataRunning = true;
+    }
+    catch(Exception e) { 
+      println("External Data Port Could Not Be Opened, Function will not work."); 
+      matrix.externalDataRunning = false;
+    }
+  } //end externalDataEnable if
+  //end external data
+
+  //only serial mode enabled as of now
+  switch(matrix.transmissionType)
+  {
+  case 0: //none
+
+    break;
+  case 1: //NLED Serial
+  case 2: //Glediator Serial
+    try {
+      serialPort.stop();
+    }
+    catch(Exception e) { 
+      println("No Serial Port To Close");
+    }
+
+    try {
+        serialPort = new Serial(this, Serial.list()[matrix.serialPort], matrix.serialBaud);
+        println("Opened serial port: "+Serial.list()[matrix.serialPort]+" at "+matrix.serialBaud+" baud.");
+    }
+    catch(Exception e)
+    {
+          matrix.transmissionType = 0; //new BETA 0.2
+          println("Could not open output serial data port");
+    }
+
+    break;
+  case 3:
+
+    break;
+  } //end switch
+
+   //Rerun this if using the "Reload Configs" button, transmission thread will send it when the thread starts
+  if (matrix.auroraCMD == true) RequestAuroraProtocolLiveMode();
+}
+
+//=============================================================================================================
+
+void RequestAuroraProtocolLiveMode()
+{
     println("Attempting NLED Aurora live control connection");
+    //Sends the command for bulk live control using the NLED protocol
     try {
       serialPort.write("N"); 
       serialPort.write("L");  
@@ -27,14 +90,14 @@ void OutputTransmissionThread() //threaded transmission
       serialPort.write("D");  
       serialPort.write("1");   
       serialPort.write("1");      
-      delay(5);
+      delay(5); //controller will send acknowledge, ignore it and assume it was received
       serialPort.write("n"); 
       serialPort.write("l");  
       serialPort.write("e");   
       serialPort.write("d");  
       serialPort.write("9");   
       serialPort.write("9");
-      delay(5);  
+      delay(5);  //controller will send acknowledge, ignore it and assume it was received
       serialPort.write(60);  //Live Mode Command
       serialPort.write(1);   //Enable Live Mode
       serialPort.write(0); 
@@ -45,8 +108,21 @@ void OutputTransmissionThread() //threaded transmission
     catch(Exception e) { 
       println("No COM Port open to send NLED Aurora Live Control CMD to");
     }
-  }
+}
 
+//=============================================================================================================
+
+void OutputTransmissionThread() //threaded transmission
+{
+  println("SendPixelBuffer() thread started");
+
+  color tempColor;
+  byte myRed, myGreen, myBlue;
+  int x = 0;
+
+  delay(1000); //wait to start transmitting after thread is started
+
+  if (matrix.auroraCMD == true) RequestAuroraProtocolLiveMode();
 
   //intial wait til first frame is ready
   while (PacketReadyForTransmit == false)
@@ -61,6 +137,7 @@ void OutputTransmissionThread() //threaded transmission
   {
     x = 0; //clear everytime a packet is built
 
+	//println("tick");
     //transmitPixelBuffer = MixedContentGBuf.get(); //convert from PGraphics to PImage for transmission by reading pixels[]  
 
     //for (int i = 0; i <= TransmissionArray.length; i++)
@@ -82,7 +159,7 @@ void OutputTransmissionThread() //threaded transmission
         if (myBlue == 1) myGreen = 0;
       }
 
-      //need to add the rest
+      //apply the color order, if the controller is doing the color order, use RGB here
       switch(matrix.colorOrderID)
       {
       case 0://RGB
@@ -96,12 +173,21 @@ void OutputTransmissionThread() //threaded transmission
         TransmissionArray[x++] = myGreen;          
         break;
       case 2: //GBR
+        TransmissionArray[x++] = myGreen;
+        TransmissionArray[x++] = myBlue;  
+        TransmissionArray[x++] = myRed;         
         break;
       case 3: //RBG
+         TransmissionArray[x++] = myRed;
+        TransmissionArray[x++] = myBlue;  
+        TransmissionArray[x++] = myGreen;       
         break;
       case 4: //BGR
+        TransmissionArray[x++] = myBlue;
+        TransmissionArray[x++] = myGreen;  
+        TransmissionArray[x++] = myRed;        
         break;
-      case 5:      //WS2812B - GRB
+      case 5: //WS2812B - GRB
         TransmissionArray[x++] = myGreen;
         TransmissionArray[x++] = myRed;  
         TransmissionArray[x++] = myBlue;     
@@ -109,15 +195,21 @@ void OutputTransmissionThread() //threaded transmission
       } //end switch
     } //end for()
 
-    //now do dithering/gamma correction by editing  TransmissionArray, note they are signed bytes, so careful typecasting
+    //now do dithering/gamma correction by editing TransmissionArray, note they are signed bytes, so careful typecasting
 
     //transmissionType; //0: none, 1: NLED serial, 2: glediator serial, 3: TCP, 4: UDP, ??
-    if (matrix.transmissionType == 2)  serialPort.write(1); //if glediator output add leading 1
-    if (matrix.transmissionType == 1 || matrix.transmissionType == 2) serialPort.write(TransmissionArray); //end it out
+    try {
+    if (matrix.transmissionType == 2)  serialPort.write(1); //if glediator output add leading 1 for framing
+    if (matrix.transmissionType == 1 || matrix.transmissionType == 2) serialPort.write(TransmissionArray); //send out the packet
+    }
+    catch(Exception e)
+    {
+     println("Error sending transmission array to serial port"); 
+    }
+    
+    if(recordToFileButton.selected == true) thread("FileRecoderAddFrame"); //record packet to file if enabled - recorded file has color order applied
 
-    if(recordToFileButton.selected == true) thread("FileRecoderAddFrame"); //record to file if enabled
-
-    //packet sent or is transmitting
+    //packet sent or is currently transmitting
     PacketReadyForTransmit = false; //clear the flag
 
     //wait here until next frame is ready for transmission
@@ -125,7 +217,8 @@ void OutputTransmissionThread() //threaded transmission
     {
       delay(1);
     } //end wait while()
-
+		
+    holdMillis = millis(); //update here
     //Will also wait for correct timing, want a packet to be updated and within the required time
 
     //println("Transmission thread sent packet "+millis());
@@ -138,7 +231,7 @@ void FileRecoderAddFrame()  //called threaded from the output transmission threa
 {
   //Takes the received packet, and writes all the values as single comma delimeted line
   //Doubt this is the most efficent way to do it. But works well enough
- // println("FileRecoderAddFrame()");
+ // This saves the data values to the text file in the order they are transmitted, so the patch file directs data value ordering
  
   try 
   {
@@ -146,7 +239,8 @@ void FileRecoderAddFrame()  //called threaded from the output transmission threa
     bw = new BufferedWriter(fw);
     for (int i = 0; i != PatchedChannels; i++)
     {
-      bw.write(str(TransmissionArray[i] & 0xFF)+","); //the & 0xFF converts the signed byte to unsigned so it can be converted to a string
+	if(FileRecorderFormat == 0) bw.write(str(TransmissionArray[i] & 0xFF)+","); //the & 0xFF converts the signed byte to unsigned so it can be converted to a string
+    else if(FileRecorderFormat == 1) bw.write(TransmissionArray[i] & 0xFF); //writes binary/byte/raw files, can only be viewed with a Hex viewer
     }
     bw.newLine(); //add a new line for the next packet / frame.
   } 
@@ -169,3 +263,7 @@ void FileRecoderAddFrame()  //called threaded from the output transmission threa
 }
 
 //=============================================================================================================
+
+
+
+

@@ -56,27 +56,27 @@ class OverlayMenu
 
     switch(ObjID)
     {
-    case 1:  //Source Content ------------------------------------------------------------------------------------
+    case cOverlayMediaTileMenu:  //Media Content Tiles------------------------------------------------------------------------------------
 
       int tempW, tempH;
 
-      for (int i = 0; i != menuSourceConentButtons.length; i++) menuSourceConentButtons[i].display();
+      for (int i = 0; i != menuMediaTileMenuButtons.length; i++) menuMediaTileMenuButtons[i].display();
 
       //workingTileID is not yet created, so would error if this runs, because it otherwise runs the NULL ID
       textSize(22);
       fill(gui.textMenuColor);
-      if (workingTileID <= DefinedContentSources)
-        text("Choose Content Source, Slot: "+(sourceConentTile[workingTileID].idNum), xOffset+20, yOffset+40);
+      if (workingTileID <= DefinedMediaTiles)
+        text("Choose Media Content, Slot: "+(mediaContentTile[workingTileID].idNum), xOffset+20, yOffset+40);
       else    
-      text("Choose Content Source", xOffset+20, yOffset+40);
+      text("Choose Media Content", xOffset+20, yOffset+40);
 
       textSize(16);    
       text("(Click button to\nopen file dialog)", xOffset+20, yOffset+335);
 
-      switch(getSourceContentTileTypeID())
+      switch(getmediaContentObjTypeID())
       {
       case cTypeIDNULL: //IDs:0=NULL,
-        text("Please Select a Source", xOffset+200, yOffset+80);
+        text("Please Select a Media Source", xOffset+200, yOffset+80);
         break;
 
       case cTypeIDVideo: //1=Video File(AVI, MOV, etc)
@@ -84,76 +84,58 @@ class OverlayMenu
       case cTypeIDImage: //3=Static Image
       case cTypeIDSpout: //4=Syphon/Spout     
 
-        if (getSourceContentTileTypeID() == cTypeIDSpout) text("Spout/Syphon: Reference name?   Spout/Sypon Object ID: "+sourceConentTile[workingTileID].instanceID, xOffset+180, yOffset+65);
-        else  text("File Path: "+sourceConentTile[workingTileID].filePath, xOffset+180, yOffset+65);
+        if (getmediaContentObjTypeID() == cTypeIDSpout) text("Spout/Syphon: Reference name?   Spout/Sypon Object ID: "+mediaContentTile[workingTileID].instanceID, xOffset+180, yOffset+65);
+        else  text("File Path: "+mediaContentTile[workingTileID].filePath, xOffset+180, yOffset+65);
 
-        text("Native Width: "+sourceConentTile[workingTileID].nativeWidth+"px", xOffset+180, yOffset+85);
-        text("Native Height: "+sourceConentTile[workingTileID].nativeHeight+"px", xOffset+180, yOffset+105);
-        text("FPS: "+sourceConentTile[workingTileID].contentFPS, xOffset+180, yOffset+125);
+        text("Native Width: "+mediaContentTile[workingTileID].nativeWidth+"px", xOffset+180, yOffset+85);
+        text("Native Height: "+mediaContentTile[workingTileID].nativeHeight+"px", xOffset+180, yOffset+105);
+        text("FPS: "+mediaContentTile[workingTileID].contentFPS, xOffset+180, yOffset+125);
 
         text("CropX:", contentOffsetX.xpos-65, contentOffsetX.ypos+20);
         text("CropY:", contentOffsetY.xpos-65, contentOffsetY.ypos+20);     
 
-        text("CropW:", contentGUICropW.xpos-65, contentGUICropW.ypos+20);
-        text("CropH:", contentGUICropH.xpos-65, contentGUICropH.ypos+20); 
+        text("CropW:", mediaMenuGUICropW.xpos-65, mediaMenuGUICropW.ypos+20);
+        text("CropH:", mediaMenuGUICropH.xpos-65, mediaMenuGUICropH.ypos+20); 
 
         //max width 600px, max height is 400px, figure out how to scale image proportionally   
-        tempW = scaleImageW(sourceConentTile[workingTileID].nativeWidth, sourceConentTile[workingTileID].nativeHeight, 600, 400);
-        tempH = scaleImageH(sourceConentTile[workingTileID].nativeWidth, sourceConentTile[workingTileID].nativeHeight, 600, 400);
+        tempW = scaleImageW(mediaContentTile[workingTileID].nativeWidth, mediaContentTile[workingTileID].nativeHeight, 600, 400);
+        tempH = scaleImageH(mediaContentTile[workingTileID].nativeWidth, mediaContentTile[workingTileID].nativeHeight, 600, 400);
         //println(tempW+"  "+tempH);
-
-        //fill(255,0,0);
-        //rect(xOffset+180, yOffset+180, 600, 400);  
-        image(sourceConentTile[workingTileID].thumbnailImg, xOffset+180, yOffset+180, tempW, tempH);   
-
+		
+        image(mediaContentTile[workingTileID].mediaImage, xOffset+180, yOffset+180, tempW, tempH);   
 
         //now draw the stuff for cropping and shifting - will need to make it common to other
         //offsetX = offsetY = 0; //init with no offiset cropWidth = 0; //0 = null usage  cropHeight = 0; //0 = null usage  scaleOption = 0;      
 
-        float ratio = scaleImageRatio(sourceConentTile[workingTileID].nativeWidth, sourceConentTile[workingTileID].nativeHeight, 600, 400);
+        float ratio = scaleImageRatio(mediaContentTile[workingTileID].nativeWidth, mediaContentTile[workingTileID].nativeHeight, 600, 400);
 
-        int calcWidth = sourceConentTile[workingTileID].offsetX + sourceConentTile[workingTileID].cropWidth;
-        int calcHeight = sourceConentTile[workingTileID].offsetY + sourceConentTile[workingTileID].cropHeight;
-
-        if (calcWidth > sourceConentTile[workingTileID].nativeWidth) 
-        {
-          sourceConentTile[workingTileID].cropWidth = sourceConentTile[workingTileID].nativeWidth - sourceConentTile[workingTileID].offsetX;  
-          contentGUICropW.setValue(sourceConentTile[workingTileID].cropWidth); //update GUI element
-        }
-
-        if (calcHeight > sourceConentTile[workingTileID].nativeHeight) 
-        {
-          sourceConentTile[workingTileID].cropHeight =  sourceConentTile[workingTileID].nativeHeight - sourceConentTile[workingTileID].offsetY;  
-          contentGUICropH.setValue(sourceConentTile[workingTileID].cropHeight);  //update GUI element
-        }
-
-        tempW = int((float)(sourceConentTile[workingTileID].cropWidth)  / ratio);
-        tempH = int((float)(sourceConentTile[workingTileID].cropHeight) / ratio);  
+        tempW = int((float)(mediaContentTile[workingTileID].cropWidth)  / ratio);
+        tempH = int((float)(mediaContentTile[workingTileID].cropHeight) / ratio);  
 
         stroke(255, 0, 0);
         strokeWeight(2);
         fill(0, 0, 0, 0);
-        rect(xOffset+180+(sourceConentTile[workingTileID].offsetX/ratio), yOffset+180+(sourceConentTile[workingTileID].offsetY/ratio), tempW, tempH);
+        rect(xOffset+180+(mediaContentTile[workingTileID].offsetX/ratio), yOffset+180+(mediaContentTile[workingTileID].offsetY/ratio), tempW, tempH);
 
         //Draw Handles    
         noStroke();
         fill(255, 0, 0);
-        rect(xOffset+180-10+((float)sourceConentTile[workingTileID].offsetX/ratio), yOffset+180-10+((float)sourceConentTile[workingTileID].offsetY/ratio), 20, 20); //top left      
-        rect(xOffset+180-10+((float)sourceConentTile[workingTileID].offsetX/ratio), yOffset+180-10+tempH+((float)sourceConentTile[workingTileID].offsetY/ratio), 20, 20);    //bottom left            
-        rect(xOffset+180-10+((float)sourceConentTile[workingTileID].offsetX/ratio)+tempW, yOffset+180-10+((float)sourceConentTile[workingTileID].offsetY/ratio), 20, 20); //top right          
-        rect(xOffset+180-10+((float)sourceConentTile[workingTileID].offsetX/ratio)+tempW, yOffset+180-10+tempH+((float)sourceConentTile[workingTileID].offsetY/ratio), 20, 20); //bottom right          
+        rect(xOffset+180-10+((float)mediaContentTile[workingTileID].offsetX/ratio), yOffset+180-10+((float)mediaContentTile[workingTileID].offsetY/ratio), 20, 20); //top left      
+        rect(xOffset+180-10+((float)mediaContentTile[workingTileID].offsetX/ratio), yOffset+180-10+tempH+((float)mediaContentTile[workingTileID].offsetY/ratio), 20, 20);    //bottom left            
+        rect(xOffset+180-10+((float)mediaContentTile[workingTileID].offsetX/ratio)+tempW, yOffset+180-10+((float)mediaContentTile[workingTileID].offsetY/ratio), 20, 20); //top right          
+        rect(xOffset+180-10+((float)mediaContentTile[workingTileID].offsetX/ratio)+tempW, yOffset+180-10+tempH+((float)mediaContentTile[workingTileID].offsetY/ratio), 20, 20); //bottom right          
 
         imgScalingOptionsDD.display();
         contentOffsetX.display();
         contentOffsetY.display();
-        contentGUICropW.display();
-        contentGUICropH.display();
+        mediaMenuGUICropW.display();
+        mediaMenuGUICropH.display();
 
         break;
       case cTypeIDGenerated: //Generated Content
         text("Select Generated Content Type: ", xOffset+180, yOffset+80);
-        generatedSourceContentDD.display();
-        generatedSourceContentFPS.display();
+        generatedMediaDD.display();
+        generatedMediaFPS.display();
         strokeWeight(2);
         stroke(255);
         line(xOffset+180, yOffset+95, xOffset+Width-20, yOffset+95);
@@ -162,7 +144,7 @@ class OverlayMenu
         textSize(16);  
         textAlign(RIGHT);
 
-        switch(sourceConentTile[workingTileID].generatedType)  //add additional generated types/objects here
+        switch(mediaContentTile[workingTileID].generatedType)  //add additional generated types/objects here
         {
         case 0: //null
 
@@ -197,14 +179,14 @@ class OverlayMenu
           text("Decay:", genStarsDecayNIF.xpos-10, genStarsDecayNIF.ypos+genStarsDecayNIF.size);          
           text("Fill Color:", genStarsFillColor.xpos-10, genStarsFillColor.ypos+genStarsFillColor.size);
           text("Stroke Color:", genStarsStrokeColor.xpos-10, genStarsStrokeColor.ypos+genStarsStrokeColor.size);         
-          text("Twinkle:", genStarsTwinkleEnable.xpos-10, genStarsTwinkleEnable.ypos+genStarsTwinkleEnable.size);
+          text("Z Distance:", genStarsZDistEnable.xpos-10, genStarsZDistEnable.ypos+genStarsZDistEnable.size);
 
           genStarsShapeDD.display();
           genStarsSizeNIF.display();
           genStarsStrokeNIF.display();
           genStarsQuantityNIF.display();
           genStarsDecayNIF.display();
-          genStarsTwinkleEnable.display();
+          genStarsZDistEnable.display();
           genStarsFillColor.display();
           genStarsStrokeColor.display();
           break;
@@ -356,22 +338,31 @@ class OverlayMenu
         } //end generated dropdown switch
         break;  
       case cTypeIDDataFile: //recorded data file input 
-         text("Play Data File:\nCompatible with recorded files from this software. Plays the file back, looping endlessly.\nOnly supports one data file source content at a time.\nWill be expanded in the future.", xOffset+180, yOffset+100); 
-         text("File Path: "+sourceConentTile[workingTileID].filePath, xOffset+180, yOffset+200); 
-         
-       
+         text("Play Data File:\nCompatible with recorded files from this software. Plays the file back, looping endlessly.\nOnly supports one data file media content at a time.\nWill be expanded in the future.", xOffset+180, yOffset+100); 
+         text("File Path: "+mediaContentTile[workingTileID].filePath, xOffset+180, yOffset+200); 
         break;  
       case cTypeIDExtData: //external data stream ------------------------------------------------------------------------------------
 
         text("Currently only Glediator serial protocol is supported for external data input.\nExpect to add other protocols in the future.\nSoftware expects it to be setup for:\nWidth: "+matrix.width+"   Height: "+matrix.height, xOffset+180, yOffset+200); 
-
-        if (ExternalDataRunning == true && Serial.list()[matrix.externalDataPort] != null)
+		try {
+        if (matrix.externalDataEnable == true && Serial.list()[matrix.externalDataPort] != null)
           text("External Data:\nReceiving on serial port: "+Serial.list()[matrix.externalDataPort]+" at "+matrix.externalDataBaud+" baud", xOffset+180, yOffset+100); 
         else 
         {
           text("External Data is not running properly, check configurations.", xOffset+180, yOffset+100); 
-          text("Tried to use "+Serial.list()[matrix.externalDataPort]+" but failed or was unavailable", xOffset+180, yOffset+140);
         }
+		}
+		catch(Exception e)
+		{
+
+		}
+		try {
+		text("Tried to use "+Serial.list()[matrix.externalDataPort]+" but failed or was unavailable", xOffset+180, yOffset+140);
+		}
+		catch(Exception e)
+		{
+			
+		}
 
         text("Packet Rate(mS): "+ExternalDataMillis, xOffset+180, yOffset+320); 
         break;
@@ -427,12 +418,18 @@ class OverlayMenu
       fill(gui.textMenuColor);
       text("Main Menu:", xOffset+20, yOffset+20);   
       textSize(14);
-      text("(Edit and reload config files to apply changes)", xOffset+10, yOffset+40);  
+	  textLeading(14);
+      text("(Edit INI files and reload config files to\napply changes)", xOffset+10, yOffset+40);  
+      text("Media Content Files", xOffset+210, yOffset+65);  
 
-      text("Output Serial Port: "+ Serial.list()[matrix.serialPort], xOffset+20, yOffset+110);
+	  
+	if(matrix.transmissionType == 1|| matrix.transmissionType == 2)
+		{
+      text("Output Serial Port: "+Serial.list()[matrix.serialPort], xOffset+20, yOffset+110);
+		} 
       text("Output Serial Baud: "+matrix.serialBaud, xOffset+20, yOffset+130);
       text("Output FPS: "+matrix.outputFPS+"mS", xOffset+20, yOffset+150);
-      text("Output Color Order: "+matrix.colorOrderID, xOffset+20, yOffset+170);
+      text("Output Color Order: "+cColorOrderStr[matrix.colorOrderID], xOffset+20, yOffset+170);
       text("Aurora Command: "+matrix.auroraCMD, xOffset+20, yOffset+190); 
       text("Name: "+matrix.name, xOffset+20, yOffset+240);   
       text("Patch File: "+matrix.patchFileName, xOffset+20, yOffset+260);       
@@ -440,12 +437,12 @@ class OverlayMenu
       text("Footage Path: "+matrix.footagePath, xOffset+20, yOffset+300);   
       text("Automatic File: "+matrix.automaticFileName, xOffset+20, yOffset+320); 
 
-      if (matrix.externalDataEnable == true && ExternalDataRunning == true)
+      if (matrix.externalDataEnable == true && matrix.externalDataRunning == true)
       {
         text("External Data Port: "+Serial.list()[matrix.externalDataPort], xOffset+20, yOffset+350);   
         text("External Port Baud: "+matrix.externalDataBaud, xOffset+20, yOffset+370);
-      } else
-        text("No External Data Port", xOffset+20, yOffset+350);   
+      } 
+      else text("No External Data Port", xOffset+20, yOffset+350);   
 
       reloadConfigFilesButton.display();
       loadContentFileButton.display();
@@ -485,24 +482,24 @@ class OverlayMenu
 
     switch(ObjID)
     {
-    case cOverlaySourceContent: //Source Content
+    case cOverlayMediaTileMenu:  //Media Content Tiles
       //start common
-      for (int i = 0; i != menuSourceConentButtons.length; i++)
+      for (int i = 0; i != menuMediaTileMenuButtons.length; i++)
       {
-        menuSourceConentButtons[i].xpos = xOffset+20;
-        menuSourceConentButtons[i].ypos = yOffset+80+(i*35);
-        menuSourceConentButtons[i].selected = false;
+        menuMediaTileMenuButtons[i].xpos = xOffset+20;
+        menuMediaTileMenuButtons[i].ypos = yOffset+80+(i*35);
+        menuMediaTileMenuButtons[i].selected = false;
       }
 
-      if (sourceConentTile[workingTileID] != null && sourceConentTile[workingTileID].typeID > 0)
+      if (mediaContentTile[workingTileID] != null && mediaContentTile[workingTileID].typeID > 0)
       {
         //rule because of gaps in the ID#s for typeID
-        if (sourceConentTile[workingTileID].typeID == cTypeIDExtData) menuSourceConentButtons[6].selected = true; 
-        else menuSourceConentButtons[sourceConentTile[workingTileID].typeID-1].selected = true;
+        if (mediaContentTile[workingTileID].typeID == cTypeIDExtData) menuMediaTileMenuButtons[6].selected = true; 
+        else menuMediaTileMenuButtons[mediaContentTile[workingTileID].typeID-1].selected = true;
       }
       //end common
 
-      switch(getSourceContentTileTypeID())
+      switch(getmediaContentObjTypeID())
       {
       case cTypeIDNULL:
 
@@ -513,39 +510,39 @@ class OverlayMenu
       case cTypeIDSpout:
         imgScalingOptionsDD.xpos = xOffset+180;
         imgScalingOptionsDD.ypos = yOffset+130;
-        imgScalingOptionsDD.setValue(sourceConentTile[workingTileID].scaleOption);
+        imgScalingOptionsDD.setValue(mediaContentTile[workingTileID].scaleOption);
 
-        contentOffsetX.setValue(sourceConentTile[workingTileID].offsetX);  
-        contentOffsetY.setValue(sourceConentTile[workingTileID].offsetY);
-        contentGUICropW.setValue(sourceConentTile[workingTileID].cropWidth);
-        contentGUICropH.setValue(sourceConentTile[workingTileID].cropHeight);    
+        contentOffsetX.setValue(mediaContentTile[workingTileID].offsetX);  
+        contentOffsetY.setValue(mediaContentTile[workingTileID].offsetY);
+        mediaMenuGUICropW.setValue(mediaContentTile[workingTileID].cropWidth);
+        mediaMenuGUICropH.setValue(mediaContentTile[workingTileID].cropHeight);    
 
         contentOffsetX.xpos = xOffset+450;
         contentOffsetX.ypos = yOffset+80; 
         contentOffsetY.xpos = xOffset+450;
         contentOffsetY.ypos = yOffset+115;
 
-        contentGUICropW.xpos = xOffset+660; 
-        contentGUICropW.ypos = yOffset+80;
-        contentGUICropH.xpos = xOffset+660; 
-        contentGUICropH.ypos = yOffset+115;
+        mediaMenuGUICropW.xpos = xOffset+660; 
+        mediaMenuGUICropW.ypos = yOffset+80;
+        mediaMenuGUICropH.xpos = xOffset+660; 
+        mediaMenuGUICropH.ypos = yOffset+115;
 
         break;
       case cTypeIDGenerated: //--------------------------------------------------------------------------------------------------
 
         //common to all Generated Types
-        generatedSourceContentDD.setValue(sourceConentTile[workingTileID].generatedType); //ensure its updated, where else could it be set?
-        generatedSourceContentFPS.setValue(sourceConentTile[workingTileID].contentFPS);
+        generatedMediaDD.setValue(mediaContentTile[workingTileID].generatedType); //ensure its updated, where else could it be set?
+        generatedMediaFPS.setValue(mediaContentTile[workingTileID].contentFPS);
 
 
-        generatedSourceContentDD.xpos = xOffset+410;
-        generatedSourceContentDD.ypos = yOffset+60;
+        generatedMediaDD.xpos = xOffset+410;
+        generatedMediaDD.ypos = yOffset+60;
 
-        generatedSourceContentFPS.xpos = xOffset+580;
-        generatedSourceContentFPS.ypos = yOffset+60;
+        generatedMediaFPS.xpos = xOffset+580;
+        generatedMediaFPS.ypos = yOffset+60;
         //end common
 
-        switch(sourceConentTile[workingTileID].generatedType)  //add additional generated types/objects here
+        switch(mediaContentTile[workingTileID].generatedType)  //add additional generated types/objects here
         {
         case 0: //null
 
@@ -578,12 +575,12 @@ class OverlayMenu
           genTextBackgroundColor.ypos = yOffset+390;
 
           //load initial values into GUI elements
-          genTextLabel.label = genContentText[sourceConentTile[workingTileID].instanceID].textLabel;
-          genNIFTextSize.setValue(genContentText[sourceConentTile[workingTileID].instanceID].textSize);
-          genNIFTextXOffset.setValue(genContentText[sourceConentTile[workingTileID].instanceID].xOffset);
-          genNIFTextYOffset.setValue(genContentText[sourceConentTile[workingTileID].instanceID].yOffset);
-          genTextColor.selColor = genContentText[sourceConentTile[workingTileID].instanceID].fillColor;
-          genTextBackgroundColor.selColor = genContentText[sourceConentTile[workingTileID].instanceID].bgColor;
+          genTextLabel.label = genContentText[mediaContentTile[workingTileID].instanceID].textLabel;
+          genNIFTextSize.setValue(genContentText[mediaContentTile[workingTileID].instanceID].textSize);
+          genNIFTextXOffset.setValue(genContentText[mediaContentTile[workingTileID].instanceID].xOffset);
+          genNIFTextYOffset.setValue(genContentText[mediaContentTile[workingTileID].instanceID].yOffset);
+          genTextColor.selColor = genContentText[mediaContentTile[workingTileID].instanceID].fillColor;
+          genTextBackgroundColor.selColor = genContentText[mediaContentTile[workingTileID].instanceID].bgColor;
           break;
         case 2: //"Star Field"
           //intialize the GUI element positions
@@ -608,18 +605,18 @@ class OverlayMenu
           genStarsStrokeColor.xpos = xOffset+450;
           genStarsStrokeColor.ypos = yOffset+310;
 
-          genStarsTwinkleEnable.xpos = xOffset+300;
-          genStarsTwinkleEnable.ypos = yOffset+350;
+          genStarsZDistEnable.xpos = xOffset+300;
+          genStarsZDistEnable.ypos = yOffset+350;
 
           //load initial values into GUI elements
-          genStarsShapeDD.setValue(genContentStarField[sourceConentTile[workingTileID].instanceID].starShape);
-          genStarsSizeNIF.setValue(genContentStarField[sourceConentTile[workingTileID].instanceID].starSize);
-          genStarsQuantityNIF.setValue(genContentStarField[sourceConentTile[workingTileID].instanceID].starQuantity);
-          genStarsStrokeNIF.setValue(genContentStarField[sourceConentTile[workingTileID].instanceID].starStrokeWidth);
-          genStarsDecayNIF.setValue(genContentStarField[sourceConentTile[workingTileID].instanceID].decay);
-          genStarsFillColor.selColor = genContentStarField[sourceConentTile[workingTileID].instanceID].fillColor;
-          genStarsStrokeColor.selColor = genContentStarField[sourceConentTile[workingTileID].instanceID].strokeColor;
-          genStarsTwinkleEnable.selected = genContentStarField[sourceConentTile[workingTileID].instanceID].starTwinkle;
+          genStarsShapeDD.setValue(genContentStarField[mediaContentTile[workingTileID].instanceID].starShape);
+          genStarsSizeNIF.setValue(genContentStarField[mediaContentTile[workingTileID].instanceID].starSize);
+          genStarsQuantityNIF.setValue(genContentStarField[mediaContentTile[workingTileID].instanceID].starQuantity);
+          genStarsStrokeNIF.setValue(genContentStarField[mediaContentTile[workingTileID].instanceID].starStrokeWidth);
+          genStarsDecayNIF.setValue(genContentStarField[mediaContentTile[workingTileID].instanceID].decay);
+          genStarsFillColor.selColor = genContentStarField[mediaContentTile[workingTileID].instanceID].fillColor;
+          genStarsStrokeColor.selColor = genContentStarField[mediaContentTile[workingTileID].instanceID].strokeColor;
+          genStarsZDistEnable.selected = genContentStarField[mediaContentTile[workingTileID].instanceID].starZDist;
           break;
         case 3: //"Falling Blocks"
           genFallingBlocksDirection.xpos = xOffset+330;
@@ -634,11 +631,11 @@ class OverlayMenu
           genFallingBlocksColor.ypos = yOffset+270;
 
           //load initial values into GUI elements
-          genFallingBlocksDirection.setValue(genContentFallingBlocks[sourceConentTile[workingTileID].instanceID].direction);
-          genFallingBlocksSize.setValue(genContentFallingBlocks[sourceConentTile[workingTileID].instanceID].size);
-          genFallingBlocksDecay.setValue(genContentFallingBlocks[sourceConentTile[workingTileID].instanceID].decay);
-          genFallingBlocksFrequency.setValue(genContentFallingBlocks[sourceConentTile[workingTileID].instanceID].frequency);
-          genFallingBlocksColor.selColor = genContentFallingBlocks[sourceConentTile[workingTileID].instanceID].fillColor;
+          genFallingBlocksDirection.setValue(genContentFallingBlocks[mediaContentTile[workingTileID].instanceID].direction);
+          genFallingBlocksSize.setValue(genContentFallingBlocks[mediaContentTile[workingTileID].instanceID].size);
+          genFallingBlocksDecay.setValue(genContentFallingBlocks[mediaContentTile[workingTileID].instanceID].decay);
+          genFallingBlocksFrequency.setValue(genContentFallingBlocks[mediaContentTile[workingTileID].instanceID].frequency);
+          genFallingBlocksColor.selColor = genContentFallingBlocks[mediaContentTile[workingTileID].instanceID].fillColor;
           break;         
         case 4: //"Meta Balls"
           genMetaBallsColorMode.xpos = xOffset+330;
@@ -653,11 +650,11 @@ class OverlayMenu
           genMetaBallsColor.ypos = yOffset+270;
 
           //load initial values into GUI elements
-          genMetaBallsColorMode.setValue(genContentMetaBalls[sourceConentTile[workingTileID].instanceID].colorMode);
-          genMetaBallsAmount.setValue(genContentMetaBalls[sourceConentTile[workingTileID].instanceID].ballAmount);
-          genMetaBallsSize.setValue(genContentMetaBalls[sourceConentTile[workingTileID].instanceID].ballSize);
-          genMetaBallsFequency.setValue(genContentMetaBalls[sourceConentTile[workingTileID].instanceID].colorFrequency);
-          genMetaBallsColor.selColor = genContentMetaBalls[sourceConentTile[workingTileID].instanceID].fillColor;
+          genMetaBallsColorMode.setValue(genContentMetaBalls[mediaContentTile[workingTileID].instanceID].colorMode);
+          genMetaBallsAmount.setValue(genContentMetaBalls[mediaContentTile[workingTileID].instanceID].ballAmount);
+          genMetaBallsSize.setValue(genContentMetaBalls[mediaContentTile[workingTileID].instanceID].ballSize);
+          genMetaBallsFequency.setValue(genContentMetaBalls[mediaContentTile[workingTileID].instanceID].colorFrequency);
+          genMetaBallsColor.selColor = genContentMetaBalls[mediaContentTile[workingTileID].instanceID].fillColor;
           break;
         case 5: //"Ripples"
           genRipplesShape.xpos = xOffset+330;
@@ -678,13 +675,13 @@ class OverlayMenu
 
 
           //load initial values into GUI elements
-          genRipplesShape.setValue(genContentRipples[sourceConentTile[workingTileID].instanceID].shape); 
-          genRipplesAudioMode.setValue(genContentRipples[sourceConentTile[workingTileID].instanceID].audioMode); 
-          genRipplesAmplitude.setValue(genContentRipples[sourceConentTile[workingTileID].instanceID].amplitude); 
-          genRipplesStrokeWidth.setValue(genContentRipples[sourceConentTile[workingTileID].instanceID].strokeWeight);
-          genRipplesfillMethod.setValue(genContentRipples[sourceConentTile[workingTileID].instanceID].fillMethod); 
-          genRipplesFillColor.selColor = genContentRipples[sourceConentTile[workingTileID].instanceID].fillColor;
-          genRipplesStrokeColor.selColor = genContentRipples[sourceConentTile[workingTileID].instanceID].strokeColor;
+          genRipplesShape.setValue(genContentRipples[mediaContentTile[workingTileID].instanceID].shape); 
+          genRipplesAudioMode.setValue(genContentRipples[mediaContentTile[workingTileID].instanceID].audioMode); 
+          genRipplesAmplitude.setValue(genContentRipples[mediaContentTile[workingTileID].instanceID].amplitude); 
+          genRipplesStrokeWidth.setValue(genContentRipples[mediaContentTile[workingTileID].instanceID].strokeWeight);
+          genRipplesfillMethod.setValue(genContentRipples[mediaContentTile[workingTileID].instanceID].fillMethod); 
+          genRipplesFillColor.selColor = genContentRipples[mediaContentTile[workingTileID].instanceID].fillColor;
+          genRipplesStrokeColor.selColor = genContentRipples[mediaContentTile[workingTileID].instanceID].strokeColor;
           break;       
         case 6: //"Spiral"
           genSpiralColorMode.xpos = xOffset+330;
@@ -699,18 +696,18 @@ class OverlayMenu
           genSpiralColor.ypos = yOffset+270;
 
           //load initial values into GUI elements
-          genSpiralColorMode.setValue(genContentSpiral[sourceConentTile[workingTileID].instanceID].colorMode); 
-          genSpiralModeVariable.setValue(genContentSpiral[sourceConentTile[workingTileID].instanceID].modeVariable); 
-          genSpiralCoils.setValue(genContentSpiral[sourceConentTile[workingTileID].instanceID].coils);
-          genSpiralDecay.setValue(genContentSpiral[sourceConentTile[workingTileID].instanceID].decay);
-          genSpiralColor.selColor = genContentSpiral[sourceConentTile[workingTileID].instanceID].strokeColor;
+          genSpiralColorMode.setValue(genContentSpiral[mediaContentTile[workingTileID].instanceID].colorMode); 
+          genSpiralModeVariable.setValue(genContentSpiral[mediaContentTile[workingTileID].instanceID].modeVariable); 
+          genSpiralCoils.setValue(genContentSpiral[mediaContentTile[workingTileID].instanceID].coils);
+          genSpiralDecay.setValue(genContentSpiral[mediaContentTile[workingTileID].instanceID].decay);
+          genSpiralColor.selColor = genContentSpiral[mediaContentTile[workingTileID].instanceID].strokeColor;
           break;    
         case 7: //"Solid Color"
           genSolidColorFill.xpos = xOffset+300;
           genSolidColorFill.ypos = yOffset+110;
 
           //load initial values into GUI elements
-          genSolidColorFill.selColor = genContentSolidColor[sourceConentTile[workingTileID].instanceID].bgColor;
+          genSolidColorFill.selColor = genContentSolidColor[mediaContentTile[workingTileID].instanceID].bgColor;
           break;        
         case 8: //"Plasma"
           //no parameters
@@ -736,15 +733,15 @@ class OverlayMenu
           gen2DShapeEnableSmoothing.ypos = yOffset+430;
 
           //load initial values into GUI elements        
-          gen2DShapeFillColor.selColor = genContent2DShape[sourceConentTile[workingTileID].instanceID].fillColor;
-          gen2DShapeStrokeColor.selColor = genContent2DShape[sourceConentTile[workingTileID].instanceID].strokeColor;         
-          gen2DShapeStrokeWeight.setValue(genContent2DShape[sourceConentTile[workingTileID].instanceID].strokeWeight);
-          gen2DShapeSize.setValue(genContent2DShape[sourceConentTile[workingTileID].instanceID].baseSize);
-          gen2DShapeRotationSpeed.setValue(genContent2DShape[sourceConentTile[workingTileID].instanceID].rotationSpeed);
-          gen2DShapeZoomSpeed.setValue(genContent2DShape[sourceConentTile[workingTileID].instanceID].zoomSpeed);
-          gen2DShapeZoomMax.setValue(genContent2DShape[sourceConentTile[workingTileID].instanceID].zoomMax);
-          gen2DShapeZoomMin.setValue(genContent2DShape[sourceConentTile[workingTileID].instanceID].zoomMin);
-          gen2DShapeEnableSmoothing.selected = genContent2DShape[sourceConentTile[workingTileID].instanceID].enableSmoothing;
+          gen2DShapeFillColor.selColor = genContent2DShape[mediaContentTile[workingTileID].instanceID].fillColor;
+          gen2DShapeStrokeColor.selColor = genContent2DShape[mediaContentTile[workingTileID].instanceID].strokeColor;         
+          gen2DShapeStrokeWeight.setValue(genContent2DShape[mediaContentTile[workingTileID].instanceID].strokeWeight);
+          gen2DShapeSize.setValue(genContent2DShape[mediaContentTile[workingTileID].instanceID].baseSize);
+          gen2DShapeRotationSpeed.setValue(genContent2DShape[mediaContentTile[workingTileID].instanceID].rotationSpeed);
+          gen2DShapeZoomSpeed.setValue(genContent2DShape[mediaContentTile[workingTileID].instanceID].zoomSpeed);
+          gen2DShapeZoomMax.setValue(genContent2DShape[mediaContentTile[workingTileID].instanceID].zoomMax);
+          gen2DShapeZoomMin.setValue(genContent2DShape[mediaContentTile[workingTileID].instanceID].zoomMin);
+          gen2DShapeEnableSmoothing.selected = genContent2DShape[mediaContentTile[workingTileID].instanceID].enableSmoothing;
 
           break;
         case 10:  //"3D Shape"
@@ -762,12 +759,12 @@ class OverlayMenu
           gen3DShapeStrokeColor.ypos = yOffset+310;
 
           //load initial values into GUI elements
-          gen3DShapeSize.setValue(genContent3DShape[sourceConentTile[workingTileID].instanceID].size);
-          gen3DShapeStrokeWeight.setValue(genContent3DShape[sourceConentTile[workingTileID].instanceID].strokeWeight);
-          gen3DShapeRotationX.setValue(genContent3DShape[sourceConentTile[workingTileID].instanceID].rotationValX);
-          gen3DShapeRotationY.setValue(genContent3DShape[sourceConentTile[workingTileID].instanceID].rotationValY);
-          gen3DShapeEnableSmoothing.selected = genContent3DShape[sourceConentTile[workingTileID].instanceID].enableSmoothing;
-          gen3DShapeStrokeColor.selColor = genContent3DShape[sourceConentTile[workingTileID].instanceID].strokeColor;
+          gen3DShapeSize.setValue(genContent3DShape[mediaContentTile[workingTileID].instanceID].size);
+          gen3DShapeStrokeWeight.setValue(genContent3DShape[mediaContentTile[workingTileID].instanceID].strokeWeight);
+          gen3DShapeRotationX.setValue(genContent3DShape[mediaContentTile[workingTileID].instanceID].rotationValX);
+          gen3DShapeRotationY.setValue(genContent3DShape[mediaContentTile[workingTileID].instanceID].rotationValY);
+          gen3DShapeEnableSmoothing.selected = genContent3DShape[mediaContentTile[workingTileID].instanceID].enableSmoothing;
+          gen3DShapeStrokeColor.selColor = genContent3DShape[mediaContentTile[workingTileID].instanceID].strokeColor;
           break;
         case 11:  //"Sine Wave"
           genSineWaveMode.xpos = xOffset+330;
@@ -786,13 +783,13 @@ class OverlayMenu
           genSineWaveFillColor.ypos = yOffset+350;
 
           //load initial values into GUI elements
-          genSineWaveMode.setValue(genContentSineWave[sourceConentTile[workingTileID].instanceID].mode); 
-          genSineWaveAuidoMode.setValue(genContentSineWave[sourceConentTile[workingTileID].instanceID].audioMode); 
-          genSineWaveYOffset.setValue(genContentSineWave[sourceConentTile[workingTileID].instanceID].yOffset); 
-          genSineWaveAmplitude.setValue(genContentSineWave[sourceConentTile[workingTileID].instanceID].amplitude); 
-          genSineWavePeriod.setValue(genContentSineWave[sourceConentTile[workingTileID].instanceID].period); 
-          genSineWaveDecay.setValue(genContentSineWave[sourceConentTile[workingTileID].instanceID].decay); 
-          genSineWaveFillColor.selColor = genContentSineWave[sourceConentTile[workingTileID].instanceID].fillColor; 
+          genSineWaveMode.setValue(genContentSineWave[mediaContentTile[workingTileID].instanceID].mode); 
+          genSineWaveAuidoMode.setValue(genContentSineWave[mediaContentTile[workingTileID].instanceID].audioMode); 
+          genSineWaveYOffset.setValue(genContentSineWave[mediaContentTile[workingTileID].instanceID].yOffset); 
+          genSineWaveAmplitude.setValue(genContentSineWave[mediaContentTile[workingTileID].instanceID].amplitude); 
+          genSineWavePeriod.setValue(genContentSineWave[mediaContentTile[workingTileID].instanceID].period); 
+          genSineWaveDecay.setValue(genContentSineWave[mediaContentTile[workingTileID].instanceID].decay); 
+          genSineWaveFillColor.selColor = genContentSineWave[mediaContentTile[workingTileID].instanceID].fillColor; 
           break;       
         case 12:  //"Dancing Bars"
           genBarsMode.xpos = xOffset+330;
@@ -811,13 +808,13 @@ class OverlayMenu
           genBarsFillColor.ypos = yOffset+350;
 
           //load initial values into GUI elements
-          genBarsMode.setValue(genContentBars[sourceConentTile[workingTileID].instanceID].mode);
-          genBarsAuidoMode.setValue(genContentBars[sourceConentTile[workingTileID].instanceID].audioMode);
-          genBarsWidth.setValue(genContentBars[sourceConentTile[workingTileID].instanceID].barWidth);
-          genBarsSpacing.setValue(genContentBars[sourceConentTile[workingTileID].instanceID].barSpacing);
-          genBarsAmplitude.setValue(genContentBars[sourceConentTile[workingTileID].instanceID].barAmplitude);
-          genBarsDecay.setValue(genContentBars[sourceConentTile[workingTileID].instanceID].decay); 
-          genBarsFillColor.selColor = genContentBars[sourceConentTile[workingTileID].instanceID].fillColor; 
+          genBarsMode.setValue(genContentBars[mediaContentTile[workingTileID].instanceID].mode);
+          genBarsAuidoMode.setValue(genContentBars[mediaContentTile[workingTileID].instanceID].audioMode);
+          genBarsWidth.setValue(genContentBars[mediaContentTile[workingTileID].instanceID].barWidth);
+          genBarsSpacing.setValue(genContentBars[mediaContentTile[workingTileID].instanceID].barSpacing);
+          genBarsAmplitude.setValue(genContentBars[mediaContentTile[workingTileID].instanceID].barAmplitude);
+          genBarsDecay.setValue(genContentBars[mediaContentTile[workingTileID].instanceID].decay); 
+          genBarsFillColor.selColor = genContentBars[mediaContentTile[workingTileID].instanceID].fillColor; 
           break;           
         case 13:  //"Template"
           genTemplateColor.xpos = xOffset+330;
@@ -911,12 +908,12 @@ class OverlayMenu
 
       break;
     case cOverlayMainMenu:
-      reloadConfigFilesButton.xpos = xOffset+20; 
-      reloadConfigFilesButton.ypos = yOffset+60;  
+      reloadConfigFilesButton.xpos = xOffset+15; 
+      reloadConfigFilesButton.ypos = yOffset+70;  
       loadContentFileButton.xpos = xOffset+170; 
-      loadContentFileButton.ypos = yOffset+60;  
+      loadContentFileButton.ypos = yOffset+70;  
       saveContentFileButton.xpos = xOffset+280; 
-      saveContentFileButton.ypos = yOffset+60;   
+      saveContentFileButton.ypos = yOffset+70;   
       break;
     } //end ObjID switch
   } //end display()
@@ -928,7 +925,8 @@ class OverlayMenu
     if (mouseXS >= xpos && mouseXS <= xpos+Width && mouseYS >= ypos && mouseYS <= ypos+Height) 
     {      
       return true;
-    } else {
+    } 
+	else {
       return false;
     }
   } //end over()
@@ -940,7 +938,8 @@ class OverlayMenu
     if (mouseXS >= xpos-(Width/2) && mouseXS <= xpos+(Width/2) && mouseYS >= ypos-(Height/2) && mouseYS <= ypos+(Height/2)) 
     {      
       return true;
-    } else {
+    } 
+	else {
       return false;
     }
   } //end over()  
@@ -952,22 +951,22 @@ class OverlayMenu
 
     switch(ObjID)
     {
-    case 1: //Source Content
+    case cOverlayMediaTileMenu:  //Media Content Tiles
       //common to all types
-      for (int i = 0; i != menuSourceConentButtons.length; i++)
+      for (int i = 0; i != menuMediaTileMenuButtons.length; i++)
       {
-        if (menuSourceConentButtons[i].over())
+        if (menuMediaTileMenuButtons[i].over())
         {
-          println("Clicked menuSourceConentButtons "+i);
-          menuSourceConentButtonsFunc(i);
-          menuSourceConentButtons[i].selected = true; //the above function clears all the button .selected, so reset .selected.
+          println("Clicked menuMediaTileMenuButtons "+i);
+          menuMediaTileMenuButtonsFunc(i);
+          menuMediaTileMenuButtons[i].selected = true; //the above function clears all the button .selected, so reset .selected.
           allowMousePressHold = false; //DEBUG-issue with opening file dialog twice
           return true;
         } //end if()
       } //end for()
       //end common
 
-      switch(getSourceContentTileTypeID())
+      switch(getmediaContentObjTypeID())
       {
       case cTypeIDNULL:
 
@@ -978,16 +977,16 @@ class OverlayMenu
       case cTypeIDSpout:
         if (contentOffsetX.over())   return true;
         if (contentOffsetY.over())   return true;
-        if (contentGUICropW.over())  return true;  
-        if (contentGUICropH.over()) return true;
+        if (mediaMenuGUICropW.over())  return true;  
+        if (mediaMenuGUICropH.over()) return true;
         if (imgScalingOptionsDD.over()) return true;    
         break;
       case cTypeIDGenerated: //--------------------------------------------------------------------------------------------------
-        if (generatedSourceContentDD.over()) return true;
-        if (generatedSourceContentFPS.over()) return true;
+        if (generatedMediaDD.over()) return true;
+        if (generatedMediaFPS.over()) return true;
 
         //start specific for each generated type need switch 
-        switch(sourceConentTile[workingTileID].generatedType)  //add additional generated types/objects here
+        switch(mediaContentTile[workingTileID].generatedType)  //add additional generated types/objects here
         {
         case 0: //null
 
@@ -1009,7 +1008,7 @@ class OverlayMenu
           if (genStarsSizeNIF.over()) return true; //will be true if any of it was clicked
           if (genStarsQuantityNIF.over()) return true; //will be true if any of it was clicked
           if (genStarsDecayNIF.over()) return true; //will be true if any of it was clicked
-          if (genStarsTwinkleEnable.over()) return true;
+          if (genStarsZDistEnable.over()) return true;
           if (genStarsFillColor.over()) return true;     
           if (genStarsStrokeColor.over()) return true;  
           break;
@@ -1095,12 +1094,12 @@ class OverlayMenu
         } //end typeIDNum switch()
         break;
       case cTypeIDDataFile: //recorded data file input 
-        //??
+        //no GUI elements to check
         break;  
       case cTypeIDExtData:
-        //no mouse functions
+        //no GUI elements to check
         break;
-      } //end SourceContentTileTypeID switch
+      } //end mediaContentObjTypeID switch
       break;
     case cOverlayEffectsMenu:
       if (effectsOptionsDD.over()) return true;
@@ -1129,8 +1128,10 @@ class OverlayMenu
 
       if (loadContentFileButton.over())
       {
+		//selectInput("Select AllPixMatrix content file(.allpix)", "fileSelectContentFile");  
         SelectedFilePath = "/configs/"+software.configFilePath+"/"+matrix.contentFileName;  //DEBUG FOR NOW - FILE DIALOG USAGE TO BE ADDED
-        LoadUserContentFile(SelectedFilePath);
+        LoadUserContentFile(SelectedFilePath);	
+		delay(500); //prevents some sort of endless errors if user clicks multiple times too fast
       }
 
       if (saveContentFileButton.over())

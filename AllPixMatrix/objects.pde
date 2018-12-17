@@ -1,7 +1,7 @@
 
 //=================================================================================
 
-class SourceContentTile
+class mediaContentObj
 {
   String label;
   int idNum; //ID# of the content tile object
@@ -13,31 +13,31 @@ class SourceContentTile
   int instanceID; //stores the ID# for the generated & spout/syphon, object instance
 
   String filePath; //if applicable
-  PImage thumbnailImg; //stores the graphic buffer, this is used for mixing, but never overwritten - not saved
+  PImage mediaImage; //stores the graphic buffer, this is used for mixing, but never overwritten - not saved
 
   //variables for positioning and sizing large sized content
   int offsetX, offsetY;
   int cropWidth, cropHeight;
   int scaleOption; //0 = Native/Defined, 1 = scale to fit, 2 = scale to X, 3 = scale to Y
 
-  float contentFPS; //base FPS value for content
+  float contentFPS; //native FPS value for content
 
   //not saved
   int holdMillis;  //used for timing content updates
 
   int playMode; //0 = play, 1 = pause, ??
 
-  int nativeWidth = 0; //store at init, could just use thumbnailImg.width/height, but lets do this
+  int nativeWidth = 0; //store at init, could just use mediaImage.width/height, but lets do this
   int nativeHeight = 0;
 
   //--------------------------------------------------------------------------
 
-  SourceContentTile(String iLabel, int iidNum)
+  mediaContentObj(String iLabel, int iidNum)
   {
     label = iLabel;   
     idNum = iidNum;
 
-    thumbnailImg = createImage(1, 1, ARGB); //ARGB since it is an image, PGraphics are always ARGB
+    mediaImage = createImage(1, 1, ARGB); //ARGB since it is an image, PGraphics are always ARGB
     filePath = ""; 
 
     instanceID = 0;
@@ -60,13 +60,11 @@ class SourceContentTile
 
     String holdStr = ""; //declare and initialize empty
 
-    //build the sourceContent variables into a string
+    //build the mediaContent variables into a string
     holdStr = label+cFileSep+idNum+cFileSep+typeID+cFileSep+generatedType+cFileSep+instanceID+cFileSep;   
     //if (matrix.footageFilePathMethod == false) 
 
     holdStr += filePath.replace(sketchPath(""), "")+cFileSep;
-
-    //else holdStr+=filePath+cFileSep;
     holdStr+=offsetX+cFileSep+offsetY+cFileSep+cropWidth+cFileSep+cropHeight+cFileSep+scaleOption+cFileSep+contentFPS;
 
     //if content is a generated save the parameters to the string
@@ -85,31 +83,31 @@ class SourceContentTile
       //will leave switch and send default error string
       break;
     case 1: //Text
-      return genContentText[sourceConentTile[idNum].instanceID].saveParameters();
+      return genContentText[mediaContentTile[idNum].instanceID].saveParameters();
     case 2: //Star Field
-      return genContentStarField[sourceConentTile[idNum].instanceID].saveParameters(); 
+      return genContentStarField[mediaContentTile[idNum].instanceID].saveParameters(); 
     case 3: //Falling Blocks
-      return genContentFallingBlocks[sourceConentTile[idNum].instanceID].saveParameters();
+      return genContentFallingBlocks[mediaContentTile[idNum].instanceID].saveParameters();
     case 4: //"Meta Balls"
-      return genContentMetaBalls[sourceConentTile[idNum].instanceID].saveParameters();    
+      return genContentMetaBalls[mediaContentTile[idNum].instanceID].saveParameters();    
     case 5: //"Ripples"
-      return genContentRipples[sourceConentTile[idNum].instanceID].saveParameters();
+      return genContentRipples[mediaContentTile[idNum].instanceID].saveParameters();
     case 6: //"Spiral"
-      return genContentSpiral[sourceConentTile[idNum].instanceID].saveParameters();
+      return genContentSpiral[mediaContentTile[idNum].instanceID].saveParameters();
     case 7: //"Solid Color"
-      return genContentSolidColor[sourceConentTile[idNum].instanceID].saveParameters();      
+      return genContentSolidColor[mediaContentTile[idNum].instanceID].saveParameters();      
     case 8: //"Plasma"
-      return genContentPlasma[sourceConentTile[idNum].instanceID].saveParameters();
+      return genContentPlasma[mediaContentTile[idNum].instanceID].saveParameters();
     case 9: //"2D Shape"
-      return genContent2DShape[sourceConentTile[idNum].instanceID].saveParameters();
+      return genContent2DShape[mediaContentTile[idNum].instanceID].saveParameters();
     case 10:  //"3D Shape"
-      return genContent3DShape[sourceConentTile[idNum].instanceID].saveParameters();      
+      return genContent3DShape[mediaContentTile[idNum].instanceID].saveParameters();      
     case 11:  //"Sine Wave"
-      return genContentSineWave[sourceConentTile[idNum].instanceID].saveParameters();       
+      return genContentSineWave[mediaContentTile[idNum].instanceID].saveParameters();       
     case 12:  //"Dancing Bars"
-      return genContentBars[sourceConentTile[idNum].instanceID].saveParameters();        
+      return genContentBars[mediaContentTile[idNum].instanceID].saveParameters();        
     case 13:  //"Template"
-      return genContentTemplate[sourceConentTile[idNum].instanceID].saveParameters();
+      return genContentTemplate[mediaContentTile[idNum].instanceID].saveParameters();
     } //end typeID switch
     return "ERROR";
   }
@@ -136,9 +134,8 @@ class SourceContentTile
     scaleOption = int(WorkString[10]);
     contentFPS = float(WorkString[11]);
 
-    SelectedFilePath = filePath; //required for loadSourceContent()
-
-    loadSourceContent(typeID);
+    SelectedFilePath = filePath; //required for loadMediaSource()
+    loadMediaSource(typeID);
   } //end func
   
   //--------------------------------------------------------------------------
@@ -171,43 +168,43 @@ class SourceContentTile
       //will leave switch and send default error string
       break;
     case 1: //Text
-      genContentText[sourceConentTile[idNum].instanceID].loadParameters(scratchStr);
+      genContentText[mediaContentTile[idNum].instanceID].loadParameters(scratchStr);
       return;
     case 2: //Star Field
-      genContentStarField[sourceConentTile[idNum].instanceID].loadParameters(scratchStr); 
+      genContentStarField[mediaContentTile[idNum].instanceID].loadParameters(scratchStr); 
       return;
     case 3: //Falling Blocks
-      genContentFallingBlocks[sourceConentTile[idNum].instanceID].loadParameters(scratchStr);
+      genContentFallingBlocks[mediaContentTile[idNum].instanceID].loadParameters(scratchStr);
       return;
     case 4: //"Meta Balls"
-      genContentMetaBalls[sourceConentTile[idNum].instanceID].loadParameters(scratchStr);  
+      genContentMetaBalls[mediaContentTile[idNum].instanceID].loadParameters(scratchStr);  
       return;
     case 5: //"Ripples"
-      genContentRipples[sourceConentTile[idNum].instanceID].loadParameters(scratchStr);
+      genContentRipples[mediaContentTile[idNum].instanceID].loadParameters(scratchStr);
       return;
     case 6: //"Spiral"
-      genContentSpiral[sourceConentTile[idNum].instanceID].loadParameters(scratchStr);
+      genContentSpiral[mediaContentTile[idNum].instanceID].loadParameters(scratchStr);
       return;
     case 7: //"Solid Color"
-      genContentSolidColor[sourceConentTile[idNum].instanceID].loadParameters(scratchStr); 
+      genContentSolidColor[mediaContentTile[idNum].instanceID].loadParameters(scratchStr); 
       return;
     case 8: //"Plasma"
-      genContentPlasma[sourceConentTile[idNum].instanceID].loadParameters(scratchStr);
+      genContentPlasma[mediaContentTile[idNum].instanceID].loadParameters(scratchStr);
       return;
     case 9: //"2D Shape"
-      genContent2DShape[sourceConentTile[idNum].instanceID].loadParameters(scratchStr);
+      genContent2DShape[mediaContentTile[idNum].instanceID].loadParameters(scratchStr);
       return;
     case 10:  //"3D Shape"
-      genContent3DShape[sourceConentTile[idNum].instanceID].loadParameters(scratchStr); 
+      genContent3DShape[mediaContentTile[idNum].instanceID].loadParameters(scratchStr); 
       return;
     case 11:  //"Sine Wave"
-      genContentSineWave[sourceConentTile[idNum].instanceID].loadParameters(scratchStr);  
+      genContentSineWave[mediaContentTile[idNum].instanceID].loadParameters(scratchStr);  
       return;
     case 12:  //"Dancing Bars"
-      genContentBars[sourceConentTile[idNum].instanceID].loadParameters(scratchStr);   
+      genContentBars[mediaContentTile[idNum].instanceID].loadParameters(scratchStr);   
       return;
     case 13:  //"Template"
-      genContentTemplate[sourceConentTile[idNum].instanceID].loadParameters(scratchStr);
+      genContentTemplate[mediaContentTile[idNum].instanceID].loadParameters(scratchStr);
       return;
     } //end typeID switch
     println("ERROR - loadParameters not ran");
@@ -222,15 +219,13 @@ class SourceContentTile
     fill(0);
 
     rect(xpos, ypos, tileWidth, tileHeight);  
-    if (thumbnailImg != null)
+    if (mediaImage != null)
     {
-      //if(typeID == 4) thumbnailImg = getUpdatedContent(); //forces an update, but it is redundant if syphon feed is assigned to a layer which makes it update...
       try {
-        image(thumbnailImg, xpos, ypos, tileWidth, tileHeight); //stretches it to fit
+        image(mediaImage, xpos, ypos, tileWidth, tileHeight); //stretches it to fit
       }
       catch(Exception e) { 
         println("An error happened with content tile: "+idNum);
-        image(imgColorSelector, xpos, ypos, tileWidth, tileHeight); //DEBUG - Chose random image - Testing filling the image, it errors after this sometimes
       }
     }
 
@@ -244,7 +239,7 @@ class SourceContentTile
 
   //--------------------------------------------------------------------------
 
-  void loadSourceContent(int passedTypeID) //need to store the current typeID until the end, so passing is just as good way to do it
+  void loadMediaSource(int passedTypeID) //need to store the current typeID until the end, so passing is just as good way to do it
   {
     //don't update typeID yet, want to check if same as current
     int temp;
@@ -265,10 +260,12 @@ class SourceContentTile
       case cTypeIDVideo: //1=Video File(AVI, MOV, etc)
         filePath = SelectedFilePath;
 
-        loadMovieFile(idNum, filePath); //have to do in external function, movie constructor uses "this" which thinks its the sourceContentTile
+        loadMovieFile(idNum, filePath); //have to do in external function, movie constructor uses "this" which thinks its the mediaContentTile
         movieFile[idNum].loop();
-        movieFile[idNum].jump(0.0001); //should force a frame to be immidiatly available for a read()
-        while (!movieFile[idNum].available()) println("WAITING For first Frame of Movie - not a good way to do this");
+        //movieFile[idNum].jump(0.0001); //should force a frame to be immidiatly available for a read()
+		//delay required here or while waiting for available()
+		
+        while (!movieFile[idNum].available()) delay(1);	//println("WAITING For first Frame of Movie - not a good way to do this"); //fine to delay() since in a thread
         movieFile[idNum].read(); //now read it so width and height update
 
         contentFPS = movieFile[idNum].frameRate; //fill in frame rate
@@ -281,12 +278,12 @@ class SourceContentTile
         break;
       case cTypeIDImage: //3=Static Image
         filePath = SelectedFilePath;
-        thumbnailImg = loadImage(filePath); //stored here, not changed or updated
+        mediaImage = loadImage(filePath); //stored here, not changed or updated
 
         contentFPS = 1; //no need to update once loaded
 
-        nativeWidth =  thumbnailImg.width;
-        nativeHeight = thumbnailImg.height;
+        nativeWidth =  mediaImage.width;
+        nativeHeight = mediaImage.height;
 
         break;
       case cTypeIDSpout: //4=Syphon/Spout
@@ -304,9 +301,9 @@ class SourceContentTile
         instanceID = temp;  
 
 
-        nativeWidth =  spoutReciever[temp].receivePixels(thumbnailImg).width; //for whatever reason it doesn't get the value the first try, so run it twice I guess
-        nativeWidth =  spoutReciever[temp].receivePixels(thumbnailImg).width;
-        nativeHeight = spoutReciever[temp].receivePixels(thumbnailImg).height;
+        nativeWidth =  spoutReciever[temp].receivePixels(mediaImage).width; //for whatever reason it doesn't get the value the first try, so run it twice I guess
+        nativeWidth =  spoutReciever[temp].receivePixels(mediaImage).width;
+        nativeHeight = spoutReciever[temp].receivePixels(mediaImage).height;
 
         break;    
       case cTypeIDGenerated: //Generated Content
@@ -364,35 +361,41 @@ class SourceContentTile
         filePath = SelectedFilePath;
         //only one buffer, so only 1 Data File types at a time for now
         FilePlayDataBuffer = new int[(matrix.width * matrix.height) * 3];  //comes in full size, no patch yet. 3 is for RGB - needs update for single or RGBW
-        thumbnailImg.resize(matrix.width, matrix.height);
+        mediaImage.resize(matrix.width, matrix.height);
 
         FilePlayStrLines = loadStrings(filePath); //divides the lines
         ReadDataFile();
         break;
       case cTypeIDExtData: //External data stream - Glediator
         ExternalDataArray = new short[(matrix.width * matrix.height) * 3];  //comes in full size, no patch yet. 3 is for RGB - needs update for single or RGBW
-        thumbnailImg.resize(matrix.width, matrix.height);
+        mediaImage.resize(matrix.width, matrix.height);
         break;
       } //end switch
     }
     catch(Exception e)
     {
-      println("Error trying to loadSourceContent with "+idNum);
+      println("Error trying to loadMediaSource with "+idNum);
       //if(passedTypeID == cTypeIDVideo) movieFile[idNum].dispose();
       passedTypeID = 0; //will be applied to typeID below
     }
-
-    //common
+			
+	if(instanceID >= cMaxGeneratedObjects) 
+	{
+	println("Maximum amount of instances for that generated type is reached, setting to null to prevent out of bounds");	
+	instanceID = 0;	
+	generatedType = 0; //set to null
+	}
+    //Common
     cropWidth = nativeWidth;
     cropHeight = nativeHeight;
 
     typeID = passedTypeID;
-    updateContent(); //run this here
-  } //end loadSourceContent()
+    updateMedia(); //run this here
+  } //end loadMediaSource()
 
   //--------------------------------------------------------------------------
 
-  void updateContent()
+  void updateMedia()
   {
     if (playMode == 1) return; //layer is paused, return without update
 
@@ -402,7 +405,8 @@ class SourceContentTile
 
       break;
     case cTypeIDVideo: //1=Video File(AVI, MOV, etc)
-      thumbnailImg = movieFile[idNum]; //it is updated in event, must be acting as a pointer beccause it continues to update GUI even when not called
+	  movieFile[idNum].read(); //rather than run movie event, update rate unaffected
+      mediaImage = movieFile[idNum]; //it is updated in event, must be acting as a pointer beccause it continues to update GUI even when not called
       //add a .get() to surpress the pointer thing
       break;
     case cTypeIDAniGIF: //2=Animated GIF
@@ -413,7 +417,7 @@ class SourceContentTile
       break;
     case cTypeIDSpout: //4=Syphon/Spout
       //use updateSender(int Width, int Height)  to resize
-      thumbnailImg = spoutReciever[instanceID].receivePixels(thumbnailImg); //everytime this is called, it resizees the PImage to fit it, no matter what?
+      mediaImage = spoutReciever[instanceID].receivePixels(mediaImage); //everytime this is called, it resizees the PImage to fit it, no matter what?
       break;    
     case cTypeIDGenerated: //Generated Content
 
@@ -423,56 +427,56 @@ class SourceContentTile
 
         break;
       case 1: //Text
-        genContentText[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentText[sourceConentTile[idNum].instanceID].localPGBuf.get();
+        genContentText[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentText[mediaContentTile[idNum].instanceID].localPGBuf.get();
         break;
       case 2: //Star Field
-        genContentStarField[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentStarField[sourceConentTile[idNum].instanceID].localPGBuf.get();
+        genContentStarField[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentStarField[mediaContentTile[idNum].instanceID].localPGBuf.get();
         break;
       case 3: //Falling Blocks
-        genContentFallingBlocks[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentFallingBlocks[sourceConentTile[idNum].instanceID].localPGBuf.get();
+        genContentFallingBlocks[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentFallingBlocks[mediaContentTile[idNum].instanceID].localPGBuf.get();
         break;
       case 4: //"Meta Balls"
-        genContentMetaBalls[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentMetaBalls[sourceConentTile[idNum].instanceID].localPGBuf.get();
+        genContentMetaBalls[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentMetaBalls[mediaContentTile[idNum].instanceID].localPGBuf.get();
         break;
       case 5: //"Ripples"
-        genContentRipples[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentRipples[sourceConentTile[idNum].instanceID].localPGBuf.get();
+        genContentRipples[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentRipples[mediaContentTile[idNum].instanceID].localPGBuf.get();
         break;       
       case 6: //"Spiral"
-        genContentSpiral[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentSpiral[sourceConentTile[idNum].instanceID].localPGBuf.get();
+        genContentSpiral[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentSpiral[mediaContentTile[idNum].instanceID].localPGBuf.get();
         break;    
       case 7: //"Solid Color"
-        genContentSolidColor[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentSolidColor[sourceConentTile[idNum].instanceID].localPGBuf.get();   
+        genContentSolidColor[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentSolidColor[mediaContentTile[idNum].instanceID].localPGBuf.get();   
         break;        
       case 8: //"Plasma"
-        genContentPlasma[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentPlasma[sourceConentTile[idNum].instanceID].localPGBuf.get();
+        genContentPlasma[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentPlasma[mediaContentTile[idNum].instanceID].localPGBuf.get();
         break;
       case 9: //"2D Shape"
-        genContent2DShape[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContent2DShape[sourceConentTile[idNum].instanceID].localPGBuf.get();   
+        genContent2DShape[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContent2DShape[mediaContentTile[idNum].instanceID].localPGBuf.get();   
         break;
       case 10:  //"3D Shape"
-        genContent3DShape[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContent3DShape[sourceConentTile[idNum].instanceID].localPGBuf.get();   
+        genContent3DShape[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContent3DShape[mediaContentTile[idNum].instanceID].localPGBuf.get();   
         break;        
       case 11:  //"Sine Wave"
-        genContentSineWave[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentSineWave[sourceConentTile[idNum].instanceID].localPGBuf.get();  
+        genContentSineWave[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentSineWave[mediaContentTile[idNum].instanceID].localPGBuf.get();  
         break;       
       case 12:  //"Dancing Bars"
-        genContentBars[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentBars[sourceConentTile[idNum].instanceID].localPGBuf.get();  
+        genContentBars[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentBars[mediaContentTile[idNum].instanceID].localPGBuf.get();  
         break;      
       case 13:  //"Template"
-        genContentTemplate[sourceConentTile[idNum].instanceID].buildFrame();
-        thumbnailImg = genContentTemplate[sourceConentTile[idNum].instanceID].localPGBuf.get();   
+        genContentTemplate[mediaContentTile[idNum].instanceID].buildFrame();
+        mediaImage = genContentTemplate[mediaContentTile[idNum].instanceID].localPGBuf.get();   
         break;
       } //end typeID switch
       break;    
@@ -482,12 +486,15 @@ class SourceContentTile
 
       ReadDataFile(); //update FilePlayDataBuffer[]
 
-      for (int y = 0; y != thumbnailImg.pixels.length; y++)
-      {
-        thumbnailImg.pixels[y] = color(FilePlayDataBuffer[z], FilePlayDataBuffer[z+1], FilePlayDataBuffer[z+2], 255);
-        z+=3;
+      for (int y = 0; y != mediaImage.pixels.length; y++)
+      {  
+		//correct for the test 28x28 patch, check others
+	  mediaImage.pixels[((PatchCoordY[y]*mediaImage.width)+(PatchCoordX[y]))] = color(FilePlayDataBuffer[z], FilePlayDataBuffer[z+1], FilePlayDataBuffer[z+2], 255);
+	  //mediaImage.pixels[((PatchCoordX[y]*mediaImage.width)+(PatchCoordY[y]))] = color(FilePlayDataBuffer[z], FilePlayDataBuffer[z+1], FilePlayDataBuffer[z+2], 255); 
+	  //mediaImage.pixels[y] = color(FilePlayDataBuffer[z], FilePlayDataBuffer[z+1], FilePlayDataBuffer[z+2], 255); //orig	  
+      z+=3;
       }   
-      thumbnailImg.updatePixels(); //works fine without this, but does not update the content thumbnail image, it would stay black 
+      mediaImage.updatePixels(); //works fine without this, but does not update the media thumbnail image, it would stay black 
 
       break;      
     case cTypeIDExtData: //external data - glediator data stream
@@ -495,24 +502,25 @@ class SourceContentTile
       int x = 0;
 
       //data needs to be rotated clockwise 90 degrees - how is that done?
-      for (int i = 0; i != thumbnailImg.pixels.length; i++)
+      for (int i = 0; i != mediaImage.pixels.length; i++)
       {
-        // if(x == 0)  thumbnailImg.pixels[i] = color(255, 255, 255, 255); //places a white square to indicate first pixel for Debugging
-        //else 
-        thumbnailImg.pixels[i] = color(ExternalDataArray[x], ExternalDataArray[x+1], ExternalDataArray[x+2], 255);
+        mediaImage.pixels[i] = color(ExternalDataArray[x], ExternalDataArray[x+1], ExternalDataArray[x+2], 255);
         x+=3;
       }   
-      thumbnailImg.updatePixels(); //works fine without this, but does not update the content thumbnail image, it would stay black 
+      mediaImage.updatePixels(); //works fine without this, but does not update the media thumbnail image, it would stay black 
+	  
       break;
     } //end switch
   } //end func
 
+  
   //--------------------------------------------------------------------------
 
   void setPlayMode(int passedMode)
   {
-    playMode = passedMode;
+    playMode = passedMode; //this variable is checked before updateMedia(), which pauses most media
 
+	//except movies need a pause() function or when unpaused will be on a different frame since it kept playing.
     if (typeID == cTypeIDVideo)
     {
       //its a movie, pause differently
@@ -533,7 +541,7 @@ public class guiContentLayer
 
   int idNum;
   int xpos, ypos;
-  int contentIDNum; //0 is null, 1 or more is [-1]
+  int mediaIDNum; //0 is null, 1 or more is [-1]
   int passedFeedID; //0 == A, 1 == B, add more as needed
 
   int layerOpacity;
@@ -563,37 +571,38 @@ public class guiContentLayer
     if (passedFeedID == 0)
     {
       xpos = 0; //STATIC VALUE - FIX
-      layerAtileButtons[idNum] = new guiButton("", xpos+10, ypos+40, 80, 80, color(0), gui.buttonHighlightColor, color(255, 0, 0, 255), false, false, false); //never displayed but used as a button
-      layerAeffectButtons[idNum] = new guiButton("Effects", xpos+100, ypos+5, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
-      layerAsourceOptionButtons[idNum] = new guiButton("Options", xpos+210, ypos+5, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
+      feedLayersTileButtonsA[idNum] = new guiButton("", xpos+10, ypos+40, 80, 80, color(0), gui.buttonHighlightColor, color(255, 0, 0, 255), false, false, false); //never displayed but used as a button
+      feedLayersEffectsButtonsA[idNum] = new guiButton("Effects", xpos+100, ypos+5, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
+      feedLayersOptionsButtonsA[idNum] = new guiButton("Options", xpos+210, ypos+5, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
       feedLayersPlayPauseA[idNum] = new guiButton("► ‖", xpos+100, ypos+70, 35, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true);
-      layerOpacitySlidersA[idNum] = new guiSliderBar(xpos+110, ypos+100, 200, 20, 100, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, false, false, true, "layerOpacitySliderFunc"); 
-      layerASpeedNIF[idNum] = new guiNumberInputField(xpos+210, ypos+40, 25, 50, -1000, 1000, 1, "layerSpeedAdjFunc");
-      layerASpeedNIF[idNum].setValue(0);
+      feedLayersOpacitySliderA[idNum] = new guiSliderBar(xpos+110, ypos+100, 200, 20, 100, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, false, false, true, "layerOpacitySliderFunc"); 
+      feedLayersSpeedNIFA[idNum] = new guiNumberInputField(xpos+210, ypos+40, 25, 50, -1000, 1000, 1, "layerSpeedAdjFunc");
+      feedLayersSpeedNIFA[idNum].setValue(0);
 
       //not a great solution, but works, bottom layer element would have the dropdown go off screen. This selects between drop down and drop up accordingly
       //  could also automatically figure it out based on ypos, height and list length
       if (idNum==2)
-        layerAblendModeDD[idNum] = new guiDropDown(cDDStrListBlendModes, 0, xpos+100, ypos+40, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, "layerBlendingModeFunc"); //drop up
+        feedLayersBlendModeDDA[idNum] = new guiDropDown(cDDStrListBlendModes, 0, xpos+100, ypos+40, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, "layerBlendingModeFunc"); //drop up
       else
-        layerAblendModeDD[idNum] = new guiDropDown(cDDStrListBlendModes, 0, xpos+100, ypos+40, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, "layerBlendingModeFunc"); //drop down
-    } else
+        feedLayersBlendModeDDA[idNum] = new guiDropDown(cDDStrListBlendModes, 0, xpos+100, ypos+40, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, "layerBlendingModeFunc"); //drop down
+    } 
+	else
     {
       xpos = 1036;  //STATIC VALUE - FIX
-      layerBtileButtons[idNum] = new guiButton("", xpos+10, ypos+40, 80, 80, color(0), gui.buttonHighlightColor, color(255, 0, 0, 255), false, false, false); //never displayed but used as a button
-      layerBeffectButtons[idNum] = new guiButton("Effects", xpos+100, ypos+5, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
-      layerBsourceOptionButtons[idNum] = new guiButton("Options", xpos+210, ypos+5, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
+      feedLayersTileButtonsB[idNum] = new guiButton("", xpos+10, ypos+40, 80, 80, color(0), gui.buttonHighlightColor, color(255, 0, 0, 255), false, false, false); //never displayed but used as a button
+      feedLayersEffectsButtonsB[idNum] = new guiButton("Effects", xpos+100, ypos+5, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
+      feedLayersOptionsButtonsB[idNum] = new guiButton("Options", xpos+210, ypos+5, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, false, true);
       feedLayersPlayPauseB[idNum] = new guiButton("► ‖", xpos+100, ypos+70, 35, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, false, true);   
-      layerOpacitySlidersB[idNum] = new guiSliderBar(xpos+110, ypos+100, 200, 20, 100, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, false, false, true, "layerOpacitySliderFunc"); 
-      layerBSpeedNIF[idNum] = new guiNumberInputField(xpos+210, ypos+40, 25, 50, -1000, 1000, 1, "layerSpeedAdjFunc");
-      layerBSpeedNIF[idNum].setValue(0);
+      feedLayersOpacitySliderB[idNum] = new guiSliderBar(xpos+110, ypos+100, 200, 20, 100, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, false, false, true, "layerOpacitySliderFunc"); 
+      feedLayersSpeedNIFB[idNum] = new guiNumberInputField(xpos+210, ypos+40, 25, 50, -1000, 1000, 1, "layerSpeedAdjFunc");
+      feedLayersSpeedNIFB[idNum].setValue(0);
 
       //not a great solution, but works, bottom layer element would have the dropdown go off screen. This selects between drop down and drop up accordingly
       //  could also automatically figure it out based on ypos, height and list length
       if (idNum==2)
-        layerBblendModeDD[idNum] = new guiDropDown(cDDStrListBlendModes, 0, xpos+100, ypos+40, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, "layerBlendingModeFunc"); //drop up
+        feedLayersBlendModeDDB[idNum] = new guiDropDown(cDDStrListBlendModes, 0, xpos+100, ypos+40, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, true, "layerBlendingModeFunc"); //drop up
       else
-        layerBblendModeDD[idNum] = new guiDropDown(cDDStrListBlendModes, 0, xpos+100, ypos+40, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, "layerBlendingModeFunc"); //drop down
+        feedLayersBlendModeDDB[idNum] = new guiDropDown(cDDStrListBlendModes, 0, xpos+100, ypos+40, 100, 25, gui.buttonColor, gui.buttonHighlightColor, gui.textColor, false, "layerBlendingModeFunc"); //drop down
     }
 
     blendMode = 0; //set to 'blend'
@@ -612,6 +621,23 @@ public class guiContentLayer
 
   //--------------------------------------------------------------------------
 
+  void updateLayerFrame()
+  {
+	    //without the .get() the filter effects the media content source
+	  if (mediaContentTile[mediaIDNum].typeID == cTypeIDGenerated || mediaContentTile[mediaIDNum].typeID == cTypeIDExtData || mediaContentTile[mediaIDNum].typeID == cTypeIDDataFile)
+	  {  
+	//no cropping/resize
+	  scratchImg = mediaContentTile[mediaIDNum].mediaImage.get();
+	  }
+      else 
+	  {  
+		//fills scratchImg with the cropped and resized media
+	  scratchImg = mediaContentTile[mediaIDNum].mediaImage.get(mediaContentTile[mediaIDNum].offsetX, mediaContentTile[mediaIDNum].offsetY, mediaContentTile[mediaIDNum].cropWidth, mediaContentTile[mediaIDNum].cropHeight); 
+	  }
+  }
+  
+  //--------------------------------------------------------------------------
+  
   void display()
   {
     fill(gui.layerBackground);
@@ -627,20 +653,21 @@ public class guiContentLayer
 
     if (passedFeedID == 0)
     {
-      layerAeffectButtons[idNum].display();
-      layerOpacitySlidersA[idNum].display();
-      layerAblendModeDD[idNum].display();
-      layerAsourceOptionButtons[idNum].display();
+      feedLayersEffectsButtonsA[idNum].display();
+      feedLayersOpacitySliderA[idNum].display();
+      feedLayersBlendModeDDA[idNum].display();
+      feedLayersOptionsButtonsA[idNum].display();
       feedLayersPlayPauseA[idNum].display();
-      layerASpeedNIF[idNum].display();
-    } else
+      feedLayersSpeedNIFA[idNum].display();
+    } 
+	else
     {
-      layerBeffectButtons[idNum].display();
-      layerOpacitySlidersB[idNum].display();
-      layerBblendModeDD[idNum].display();
-      layerBsourceOptionButtons[idNum].display();
+      feedLayersEffectsButtonsB[idNum].display();
+      feedLayersOpacitySliderB[idNum].display();
+      feedLayersBlendModeDDB[idNum].display();
+      feedLayersOptionsButtonsB[idNum].display();
       feedLayersPlayPauseB[idNum].display();
-      layerBSpeedNIF[idNum].display();
+      feedLayersSpeedNIFB[idNum].display();
     }
 
     //draw a rect with stroke first
@@ -652,11 +679,11 @@ public class guiContentLayer
 
 
     //then if content is defined, place its thumbnail
-    if (contentIDNum > 0)
+    if (mediaIDNum > 0)
     {
-      if (sourceConentTile[contentIDNum].typeID > 0)
+      if (mediaContentTile[mediaIDNum].typeID > 0)
       {
-        sourceConentTile[contentIDNum].display(xpos+10, ypos+40); //display thumbnail
+        mediaContentTile[mediaIDNum].display(xpos+10, ypos+40); //display thumbnail
       }
     }
     //layerTileButton[idNum].display(); //these buttons are never shown, enable to see where they are placed
@@ -670,18 +697,18 @@ public class guiContentLayer
 
     contentLayerPtr = this; //set pointer/reference
 
-    //detects if layer is already selected, it will then open the SourceContent menu where it can be altered
+    //detects if layer is already selected, it will then open the media content menu where it can be altered
     if (SelectLayerID == passedVal)
     {
       if (passedStr.equals("A") && SelectFeedID == 1)
       {
         //It is feed A 
-        OpenOverlayMenu(cOverlaySourceContent, (contentLayerA[SelectLayerID].contentIDNum));
+        OpenOverlayMenu(cOverlayMediaTileMenu, (contentLayerA[SelectLayerID].mediaIDNum));
         return; //just leave, no changes would be made
       } else if (passedStr.equals("B") && SelectFeedID == 2)
       {
         //It is feed B
-        OpenOverlayMenu(cOverlaySourceContent, (contentLayerB[SelectLayerID].contentIDNum));
+        OpenOverlayMenu(cOverlayMediaTileMenu, (contentLayerB[SelectLayerID].mediaIDNum));
         return; //just leave, no changes would be made
       }
     } //end SelectLayerID if()
@@ -710,11 +737,11 @@ public class guiContentLayer
 
   //--------------------------------------------------------------------------
 
-  void loadContentToLayer(int passedValue)
+  void loadMediaToLayer(int passedValue)
   {
-    contentIDNum = passedValue;
+    mediaIDNum = passedValue;
 
-    layerFPS = sourceConentTile[contentIDNum].contentFPS; //set layer to content FPS
+    layerFPS = mediaContentTile[mediaIDNum].contentFPS; //set layer to content FPS
     blendMode = 0; //set to default 'blend'
     layerOpacity = 255; //set opacity to 100%
 
@@ -733,20 +760,21 @@ public class guiContentLayer
 
   void updateLayerGUIElements()
   {
-    //fill GUI elements with value
     if (passedFeedID == 0) 
     {
-      layerASpeedNIF[idNum].setValue(layerFPS);
-      layerOpacitySlidersA[idNum].setValue(layerOpacity);
-      layerAblendModeDD[idNum].setValue(blendMode);
-      //feedLayersPlayPauseA[contentIDNum].setPlayMode(0); //play
+      feedLayersSpeedNIFA[idNum].setValue(layerFPS);
+      feedLayersOpacitySliderA[idNum].setValue(layerOpacity);
+      feedLayersBlendModeDDA[idNum].setValue(blendMode);
+	  if(mediaContentTile[mediaIDNum].playMode == 0) feedLayersPlayPauseA[idNum].selected = false;
+      else feedLayersPlayPauseA[idNum].selected = true;
     } 
     else 
     {
-      layerBSpeedNIF[idNum].setValue(layerFPS);
-      layerOpacitySlidersB[idNum].setValue(layerOpacity);
-      layerBblendModeDD[idNum].setValue(blendMode);
-      // feedLayersPlayPauseB[contentIDNum].setPlayMode(0); //play
+      feedLayersSpeedNIFB[idNum].setValue(layerFPS);
+      feedLayersOpacitySliderB[idNum].setValue(layerOpacity);
+      feedLayersBlendModeDDB[idNum].setValue(blendMode);
+	  if(mediaContentTile[mediaIDNum].playMode == 0) feedLayersPlayPauseB[idNum].selected = false;
+      else feedLayersPlayPauseB[idNum].selected = true;
     }
   }
 
@@ -755,12 +783,12 @@ public class guiContentLayer
   void setLayerFPS(int passedVal)
   {
     layerFPS = passedVal;
-    //float tempFloat
-    if (sourceConentTile[contentIDNum].typeID == cTypeIDVideo)
+
+    if (mediaContentTile[mediaIDNum].typeID == cTypeIDVideo)
     {
       //its a movie, have to set speed. Can be positive or negative
-      movieFile[sourceConentTile[contentIDNum].idNum].speed((layerFPS / sourceConentTile[contentIDNum].contentFPS));
-      //println((float)(layerFPS / sourceConentTile[contentIDNum].contentFPS));
+      movieFile[mediaContentTile[mediaIDNum].idNum].speed((layerFPS / mediaContentTile[mediaIDNum].contentFPS));
+      //println((float)(layerFPS / mediaContentTile[mediaIDNum].contentFPS));
     }
   }
 
@@ -782,32 +810,35 @@ public class guiContentLayer
 
   String saveLayer()
   {
-    return contentIDNum+cFileSep+layerOpacity+cFileSep+layerFPS+cFileSep+blendMode+cFileSep+effectFilterIDNum+cFileSep+effectFilterVariable+cFileSep+effectContrast+cFileSep+
+    return mediaIDNum+cFileSep+layerOpacity+cFileSep+layerFPS+cFileSep+blendMode+cFileSep+effectFilterIDNum+cFileSep+effectFilterVariable+cFileSep+effectContrast+cFileSep+
       red(tintColor)+cFileSep+green(tintColor)+cFileSep+blue(tintColor)+cFileSep+alpha(tintColor)+cFileSep+red(minColor)+cFileSep+green(minColor)+cFileSep+blue(minColor)+cFileSep+
       red(maxColor)+cFileSep+green(maxColor)+cFileSep+blue(maxColor);
   }
 
   //--------------------------------------------------------------------------
 
-  void loadLayer(String passedStr)
+  
+  void loadLayer(String passedStr) //from save file
   {
     String[] WorkString = new String[16];  
     WorkString = split(passedStr, ',');
 
-    contentIDNum = int(WorkString[0]);
-
+    mediaIDNum = int(WorkString[0]);
+	if(mediaIDNum > DefinedMediaTiles) mediaIDNum = 0; //out of bounds error occured, ID# not available. Set to null
+	
     layerOpacity = int(WorkString[1]);
     layerFPS = float(WorkString[2]);
     blendMode = int(WorkString[3]);
 
     effectFilterIDNum = int(WorkString[4]);
     effectFilterVariable = float(WorkString[5]);
-    
-    tintColor = color(int(WorkString[6]), int(WorkString[7]), int(WorkString[8]),int(WorkString[9]));
-    minColor = color(int(WorkString[10]), int(WorkString[11]), int(WorkString[12]));
-    maxColor = color(int(WorkString[13]), int(WorkString[14]), int(WorkString[15]));
+    effectContrast = int(WorkString[6]);
+	
+    tintColor = color(int(WorkString[7]), int(WorkString[8]), int(WorkString[9]),int(WorkString[10]));
+    minColor = color(int(WorkString[11]), int(WorkString[12]), int(WorkString[13]));
+    maxColor = color(int(WorkString[14]), int(WorkString[15]), int(WorkString[16]));
 
-    updateLayerGUIElements();
+    updateLayerGUIElements(); //update all the parameters to their gui element
   }
   //--------------------------------------------------------------------------
 } //end guiContentLayer
@@ -874,6 +905,7 @@ class MatrixObj
   int outputFPS; //in milliseconds
 
   boolean externalDataEnable;
+  boolean externalDataRunning;
   int externalDataPort;
   int externalDataBaud;
 
@@ -886,11 +918,11 @@ class MatrixObj
 
   //--------------------------------------------------------------------------
 
-  void LoadPatchFile()
+  void loadPatchFile()
   {
     //loads a coordinate patch file, find min and mix point in both directions and scales the overall size to fit within the preview areas
     // creates the Pixel objects to display during draw and fills the Coordinate Arrays for Pixel Patching
-    println("BuildCustom()");
+    println("loadPatchFile()");
 
     int tempTransArraySize = 0;
     int Xdifference = 0;
@@ -975,11 +1007,20 @@ class MatrixObj
     if (MaxX > MaxY)
     {
       displayPixSize = ((cPreviewContentWidth-20) / MaxX);
+	  
     } 
     else
     {
       displayPixSize = ((cPreviewContentHeight-20)  / MaxY);
-    }   
+
+    }
+	//calculate offsets to center pixel preview grids
+	displayOffsetX = (((cPreviewContentWidth-20) - (displayPixSize*MaxX)) / 2);
+	displayOffsetY = (((cPreviewContentHeight-20)  - (displayPixSize*MaxY)) / 2);	
+	
+	
+	
+	println("Done loading patch");
   }//end method
 } //end object
 
