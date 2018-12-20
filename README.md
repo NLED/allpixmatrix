@@ -24,8 +24,8 @@
  Copyright 2018
  Company: Northern Lights Electronic Design, LLC
  Contact: JNygaard@NLEDShop.com
- Date Updated: December 17, 2018 
- Software Version:  v.1a
+ Date Updated: December 19, 2018 
+ Software Version:  v.1b
  Webpage: www.NLEDShop.com/nledallpixmatrix
  Written in Processing v3.4  - www.Processing.org
  
