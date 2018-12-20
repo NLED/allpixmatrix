@@ -335,8 +335,7 @@ class guiNumberInputField
   void display()
   {
     if (status == 2) return; //element is hidden, do not draw
-    //   pushStyle();
-
+	
     strokeWeight(1);
     stroke(colTxtStroke);
 
@@ -409,7 +408,6 @@ class guiNumberInputField
     handleStatus();
 
     if (selected !=3) selected = 0; //buttons do not stay highlighted but text field does
-    //   popStyle();
   }
 
 
@@ -702,8 +700,6 @@ class guiDropDown
   {
     if (status == 2) return; //do not display if status = 2 = hide
 
-    // pushStyle();
-
     if (selected == false)
     {
       displayNormal();
@@ -772,7 +768,6 @@ class guiDropDown
     }
 
     handleStatus();
-    //   popStyle();
   } //end display()
 
   //--------------------------------------------------------------------------

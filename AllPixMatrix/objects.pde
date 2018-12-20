@@ -405,9 +405,12 @@ class mediaContentObj
 
       break;
     case cTypeIDVideo: //1=Video File(AVI, MOV, etc)
+	  if(movieFile[idNum].available())
+	  {
 	  movieFile[idNum].read(); //rather than run movie event, update rate unaffected
-      mediaImage = movieFile[idNum]; //it is updated in event, must be acting as a pointer beccause it continues to update GUI even when not called
-      //add a .get() to surpress the pointer thing
+      mediaImage = movieFile[idNum].get(); //it is updated in event, must be acting as a pointer beccause it continues to update GUI even when not called
+      //add a .get() to surpress the pointer issue
+	  }
       break;
     case cTypeIDAniGIF: //2=Animated GIF
       //not sure how this is done yet
@@ -887,20 +890,26 @@ class MatrixObj
   String footagePath;
   String automaticFileName;
 
+  int patchedChannels;
+  int totalPixels;
+  
   boolean auroraCMD;
-
-  int serialPort;
+ 
+  int transmissionType; //0: none, 1: NLED serial, 2: glediator serial, 3: ArtNet, 4: ??
+	
+  int serialPortNum; //ID number is assigned by operating system, and may change if other serial devices are connected
   int serialBaud;
   //add more serial ports
-
+  
+  //Network Ports
+  String outputNetworkIPAdr;
+  int outputNetworkPort;
+  
   int width;
   int height;
   int colorOrderID; //0: RGB, 1: BRG, 2: GBR, 3: RBG, 4: BGR, 5: GRB
 
-  int transmissionType; //0: none, 1: NLED serial, 2: glediator serial, 3: TCP, 4: UDP, ??
 
-  String serverIP;
-  int serverPort;
 
   int outputFPS; //in milliseconds
 
@@ -932,7 +941,7 @@ class MatrixObj
     String[] WorkString = new String[3]; //used to divide the lines into tab
 
     WorkString = split(lines[0], '\t');
-    TotalPixels = int(WorkString[0]);
+    matrix.totalPixels = int(WorkString[0]);
 
     //---------------------------------------------------------------------------------------------------------
 
@@ -944,8 +953,8 @@ class MatrixObj
     case 3: //RBG
     case 4: //BGR
     case 5: //GRB
-      PatchedChannels = TotalPixels *3; //not the same as TotalChannels, incase of non-square matrixes
-      tempTransArraySize = PatchedChannels;
+      matrix.patchedChannels = matrix.totalPixels *3; //not the same as TotalChannels, incase of non-square matrixes
+      tempTransArraySize = matrix.patchedChannels;
       break;
 
     case 6: //RGBW - no way
@@ -958,12 +967,12 @@ class MatrixObj
       break;
     }
 
-    println("PatchedChannels: "+PatchedChannels);
-    println("TotalPixels: "+TotalPixels); 
+    println("matrix.patchedChannels: "+matrix.patchedChannels);
+    println("matrix.totalPixels: "+matrix.totalPixels); 
 
     //resizes arrays to match the amount 
     TransmissionArray = new byte[1]; //must resize the Array so it is exactly the same size as channels
-    TransmissionArray = expand(TransmissionArray, tempTransArraySize);//PatchedChannels);
+    TransmissionArray = expand(TransmissionArray, tempTransArraySize);//matrix.patchedChannels);
 
     int MinX=10000; //set to a large value
     int MinY=10000;
@@ -986,11 +995,11 @@ class MatrixObj
     Ydifference = MaxY - MinY;
     //  println(Xdifference+" : "+Ydifference);
 
-    PatchCoordX = new short[PatchedChannels]; //resize the patch arrays based on PatchedChannels
-    PatchCoordY = new short[PatchedChannels];
+    PatchCoordX = new short[matrix.patchedChannels]; //resize the patch arrays based on matrix.patchedChannels
+    PatchCoordY = new short[matrix.patchedChannels];
 
     //file created was incremented method channel numbers
-    for (int i=0; i != TotalPixels; i++)
+    for (int i=0; i != matrix.totalPixels; i++)
     {
       WorkString = split(lines[i+1], '\t');      
       PatchCoordX[i] = (short)(int(WorkString[0]) - MinX);
@@ -1028,7 +1037,7 @@ class MatrixObj
 
 class SoftwareObj
 {
-  int frameRateMs;
+  //int frameRateMs;
 
   int GUIWidth;
   int GUIHeight;
@@ -1045,7 +1054,7 @@ class SoftwareObj
   SoftwareObj()
   {
     mouseOverEnabled = true;
-    frameRateMs = (1000/cGUIRefreshFPS);
+   // frameRateMs = (1000/cGUIRefreshFPS);
   }
   //--------------------------------------------------------------------------
 } //end object

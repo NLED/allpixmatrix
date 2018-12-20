@@ -58,11 +58,15 @@ int scaleImageH(int image_width, int image_height, int reference_width, int refe
 
 //======================================================================================================
 
+//going to add a lot more to this
 String StatusMessage()
 {
-  String tempStr = "You are connected to COM "+serialPort;
+	String tempStr = "";
 
-  return tempStr;
+	if(matrix.transmissionType == 3) tempStr = "Transmitting Artnet universe(s) on "+matrix.outputNetworkIPAdr;
+	else tempStr = "You are connected to COM "+serialPort;
+
+	return tempStr;
 }
 
 //======================================================================================================

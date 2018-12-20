@@ -58,8 +58,8 @@ void EstablishOutputConnection()
     }
 
     try {
-        serialPort = new Serial(this, Serial.list()[matrix.serialPort], matrix.serialBaud);
-        println("Opened serial port: "+Serial.list()[matrix.serialPort]+" at "+matrix.serialBaud+" baud.");
+        serialPort = new Serial(this, Serial.list()[matrix.serialPortNum], matrix.serialBaud);
+        println("Opened serial port: "+Serial.list()[matrix.serialPortNum]+" at "+matrix.serialBaud+" baud.");
     }
     catch(Exception e)
     {
@@ -101,8 +101,8 @@ void RequestAuroraProtocolLiveMode()
       serialPort.write(60);  //Live Mode Command
       serialPort.write(1);   //Enable Live Mode
       serialPort.write(0); 
-      serialPort.write((PatchedChannels >> 8) & 0xFF); //MSB
-      serialPort.write(PatchedChannels & 0xFF);     //LSB
+      serialPort.write((matrix.patchedChannels >> 8) & 0xFF); //MSB
+      serialPort.write(matrix.patchedChannels & 0xFF);     //LSB
       println("NLED Aurora connection successful");
     }
     catch(Exception e) { 
@@ -119,11 +119,21 @@ void OutputTransmissionThread() //threaded transmission
   color tempColor;
   byte myRed, myGreen, myBlue;
   int x = 0;
-
+  int holdMillisOutput = millis();
+  byte[] dmxData = new byte[512]; //used to copy blocks of data, would rather use a pointer
+	
   delay(1000); //wait to start transmitting after thread is started
 
   if (matrix.auroraCMD == true) RequestAuroraProtocolLiveMode();
 
+  
+  if(matrix.transmissionType == 3)
+  {
+	// create artnet client without buffer (no receving needed)
+	artnetServer = new ArtNetClient(null);
+	artnetServer.start();
+  }
+  
   //intial wait til first frame is ready
   while (PacketReadyForTransmit == false)
   {
@@ -131,17 +141,17 @@ void OutputTransmissionThread() //threaded transmission
   } //end wait while()
 
   println("SendPixelBuffer() First Packet is Ready");
-  //println("TotalPixels: "+TotalPixels+"    Length: "+TransmissionArray.length);
+  //println("matrix.totalPixels: "+matrix.totalPixels+"    Length: "+TransmissionArray.length);
 
   while (true)
   {
     x = 0; //clear everytime a packet is built
 
-	//println("tick");
+	//println("tick "+millis());
     //transmitPixelBuffer = MixedContentGBuf.get(); //convert from PGraphics to PImage for transmission by reading pixels[]  
 
     //for (int i = 0; i <= TransmissionArray.length; i++)
-    for (int i = 0; i < TotalPixels; i++)
+    for (int i = 0; i < matrix.totalPixels; i++)
     {
       tempColor = transmitPixelBuffer.get(PatchCoordX[i], PatchCoordY[i]);
       //convert colors to 8-bit
@@ -197,16 +207,51 @@ void OutputTransmissionThread() //threaded transmission
 
     //now do dithering/gamma correction by editing TransmissionArray, note they are signed bytes, so careful typecasting
 
-    //transmissionType; //0: none, 1: NLED serial, 2: glediator serial, 3: TCP, 4: UDP, ??
-    try {
-    if (matrix.transmissionType == 2)  serialPort.write(1); //if glediator output add leading 1 for framing
-    if (matrix.transmissionType == 1 || matrix.transmissionType == 2) serialPort.write(TransmissionArray); //send out the packet
+    //transmissionType; //0: none, 1: NLED serial, 2: glediator serial, 3: ArtNet, 4: ??
+	//matrix.transmissionType = 3; // debug
+	//for(int i = 0; i < TransmissionArray.length; i++) TransmissionArray[i] = byte(i);  //debug
+
+	try {	
+		switch(matrix.transmissionType)
+		{
+		case 0: //none
+			//TransmissionArray not sent
+			break;
+		case 1: //NLED serial
+			serialPort.write(TransmissionArray); //send out the packet
+			break;
+		case 2: //glediator serial
+			serialPort.write(1); //if glediator output add leading 1 for framing
+			serialPort.write(TransmissionArray); //send out the packet
+			break;		
+		case 3: //artnet via artnetp4j
+			x = 0; //reuse local for universe count
+
+			for(int i = 0; i < TransmissionArray.length; i += 512)
+			{
+			//println("Start at: "+i+" of "+TransmissionArray.length+"     Universe: "+x);
+			if((i+512) < TransmissionArray.length)	arrayCopy(TransmissionArray, i, dmxData, 0, 512);
+			else 
+			{
+			for(int v = 0; v < dmxData.length; v++) dmxData[v] = byte(0);  //debug - clears the rest of dmxData 	
+			arrayCopy(TransmissionArray, i, dmxData, 0, (TransmissionArray.length-i));
+			}
+			
+			//Send the DMX universe to artnet	
+			artnetServer.unicastDmx(matrix.outputNetworkIPAdr, 0, x, dmxData); //IP, subnet, universe#, data array	
+			x++;
+			}
+
+			//arrayCopy(TransmissionArray, 0, dmxData, 0, 512);
+			//artnetServer.unicastDmx("127.0.0.1", 0, 0, dmxData); //IP, subnet, universe#, data array	
+			break;
+		} //end switch
     }
     catch(Exception e)
     {
-     println("Error sending transmission array to serial port"); 
-    }
-    
+     println("Error sending transmission array"); 
+    }		
+		
     if(recordToFileButton.selected == true) thread("FileRecoderAddFrame"); //record packet to file if enabled - recorded file has color order applied
 
     //packet sent or is currently transmitting
@@ -218,7 +263,8 @@ void OutputTransmissionThread() //threaded transmission
       delay(1);
     } //end wait while()
 		
-    holdMillis = millis(); //update here
+	OutputFrameRateMs = millis() - holdMillisOutput;
+	holdMillisOutput = millis();
     //Will also wait for correct timing, want a packet to be updated and within the required time
 
     //println("Transmission thread sent packet "+millis());
@@ -237,7 +283,7 @@ void FileRecoderAddFrame()  //called threaded from the output transmission threa
   {
     fw = new FileWriter(sketchPath(File.separator+"recorded"+File.separator+RecorderFileName+".txt"), true); // true means: "append"
     bw = new BufferedWriter(fw);
-    for (int i = 0; i != PatchedChannels; i++)
+    for (int i = 0; i != matrix.patchedChannels; i++)
     {
 	if(FileRecorderFormat == 0) bw.write(str(TransmissionArray[i] & 0xFF)+","); //the & 0xFF converts the signed byte to unsigned so it can be converted to a string
     else if(FileRecorderFormat == 1) bw.write(TransmissionArray[i] & 0xFF); //writes binary/byte/raw files, can only be viewed with a Hex viewer

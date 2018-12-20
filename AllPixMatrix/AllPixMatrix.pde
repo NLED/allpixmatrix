@@ -25,8 +25,8 @@
  Copyright 2018
  Company: Northern Lights Electronic Design, LLC
  Contact: JNygaard@NLEDShop.com
- Date Updated: December 17, 2018 
- Software Version:  v.1a
+ Date Updated: December 19, 2018 
+ Software Version:  v.1b
  Webpage: www.NLEDShop.com/nledallpixmatrix
  Written in Processing v3.4  - www.Processing.org
  
@@ -54,13 +54,22 @@ NLED Pixel Controller Electron - Aurora USB or Serial
 More NLED Controllers will be available soon
 Arduino Controllers that are compatible with Glediator
 
-Currently no Arduino library, but should work with any Gleidator compatible sketches. If someone wants to write one, I can link it.
+Currently no Arduino sktech, but should work with any Gleidator compatible sketches. If someone wants to write one, I can link it.
 Previously I have had reports that USB enabled Arduinos may not work with the default USB stack. I think this is because the default USB stack
 can not handle the data volume. So the stack may need to be adjusted or rewritten.
 
 Maximum Size matrix: 512x512 - not tested or know if it would actually work. But software would support it.
 
  ======================================================================================================================================
+ 
+ Changes v.1a to v.1b:
+	- Added Artnet output support, ID#3, use the OUTPUTPORT line on matrix-output.ini to set the IP address
+	- Overhauled the the application timing. No longer uses frameRate(1000) for timing
+		- Threads off the media updating, layer mixing, and final mixing. - Creates a few issues
+			- The mixing function's color min/max causes graphical GUI glitches and CPU usage has increased
+		- Now output transmission packet rate is a lot tighter and regular.
+	- Fixed the display "Output Rate(mS)" as it was showing incorrect time
+	- Numerous variable optimizations
  
 Changes BETA 0.99 to v.1a
 	- numerous GUI fixes
@@ -73,24 +82,29 @@ Changes BETA 0.99 to v.1a
 	- Renamed numerous variables and objects with more refined naming schemes
 	- Added option to record to file for string or binary/raw formated files
 	
+	
 ======================================================================================================================================
 	
 Added Notes: ----------------------------------------------------------------------------------------------------
  	 
+	With Aurora USB protocol, could only get 60mS packet rate with 784 pixels(2352 byte frames)
 	 
 	 
 General Notes: ----------------------------------------------------------------------------------------------------
  
  May run terribly on some systems - Still needs much more optimization. Use a computer with good CPU.
    - Tested on a i7-7700K, 32GB RAM, GTX 1070 GPU
-		- uses about 10% CPU, 160MB RAM
- 
- Left it on for 3 hours or so - was before the try in movie event - not yet reproducable
-	An error happened with content tile: 4 - was a movie AVI file
-	objects.pde:240:0:240:0: NullPointerException
+		- 27% CPU with hint(DISABLE_OPTIMIZED_STROKE), 160MB RAM
+		- 17% CPU without hint(DISABLE_OPTIMIZED_STROKE), 160MB RAM
+		- In the MainMixingThread() adding the delay(), which sleeps the thread, reduces CPU usage as well
 
-	
 Known Issues: ----------------------------------------------------------------------------------------------------
+ 
+	- Aurora command protocol not compatible with network(TCP/UDP) transmission methods yet
+ 
+	- Graphical GUI glitches - it is because of editing the pixel array for the scratchGBuf from a thread.
+		- No idea why it is happening, but see the MixingCommonApplyColorEffects() for details
+		- For now if a layer is not using the min/max color effects it won't run the code and won't cause the glitches
  
 	- if a USB controller or adapter is disconnected from the PC, the software will not detect it and will continue running normally
 		- this is supposedly an unsolveable issue software side. Java can't detect if the serial port is not receiving on the hardware end
@@ -111,6 +125,9 @@ Known Issues: ------------------------------------------------------------------
     - Glediator data or image needs to be rotated clockwise 90 degrees
  
     - If AURORACMD is set but a serial device is connected it may put it out of frame. Pause the output then re-enable to reset.
+ 
+	- hint(DISABLE_OPTIMIZED_STROKE) significantly increases draw() time, but strokes overlay menus if it is not used
+		- Would also help on slower systems to disable the hint(), doesn't cause any functional issues just GUI stuff
  
  
 Mouse and Keyboard Input: ----------------------------------------------------------------------------------------------------
@@ -168,7 +185,7 @@ Mouse and Keyboard Input: ------------------------------------------------------
  
  Frame Rates: --------------------------------------------------------------------------------------------
  
- - Software runs at whatever FPS, only used to update the GUI and previews - using software.frameRateMs - default to 30 FPS
+ - Software runs at a default of 30 FPS. Currently DISABLE_OPTIMIZED_STROKE is dragging that down to 15FPS
  - Transmission output is based on when newly updated data is available for transmission. Sent once flag is set.
  - Content has a FPS and layers have an FPS. When content is loaded to a layer it sets the layers FPS.
  - The layer FPS can be adjusted on the fly and does not affect the media source FPS.
@@ -271,6 +288,7 @@ Mouse and Keyboard Input: ------------------------------------------------------
  
  Future Updates: ---------------------------------------------------------------------------------------------
  
+ - Artnet reception as a media type - receive from other matrix programs
  - Media tiles need to be updated to hold layer sets. So a single selection of a media tile will load multiple layers with media.
  - Remote control - midi or OSC or whatever
  - Still need to add automatic fading, and automated playlist modes. Among many other small features. Will be a automated mixing routine.
@@ -314,8 +332,11 @@ import ddf.minim.analysis.*;
 import java.io.BufferedWriter; //required for file recording mode
 import java.io.FileWriter; //required for file recording mode
 
-//Midi for external control
-//add later
+//Midi for external control - add later
+
+//Artnet via artnetp4j
+import ch.bildspur.artnet.*;
+
 
 //============================ Software Constants ================================
 
@@ -421,9 +442,10 @@ boolean allowMousePressHold = false;
 int mouseXS, mouseYS; //scaled mouse values for resizing, must be updated before use. Do not use native mouseX or mouseY
 float SF = 1; //scale factor
 
-int guiRefreshMs = 100; //updated by software object
 boolean mixFeeds = false;
-int holdMillis = millis();
+int holdMillisDraw = millis();
+int OutputFrameRateMs = 0;
+
 
 int displayPixSize = 10; //start at default, recalculated to new size when patch file is loaded
 int displayOffsetX = 0;
@@ -452,8 +474,6 @@ int SelectFeedID = 0;
 short[] PatchCoordX = new short[1];
 short[] PatchCoordY = new short[1];
 
-int PatchedChannels = 1; //number of channels that are actually patched, not total
-int TotalPixels = 1; //not the same as TotalChannels, incase of non-square matrixes
 
 //System Variables
 boolean PrintDebugMessages = false;
@@ -479,11 +499,16 @@ int[] FilePlayDataBuffer = new int[1];
 String[] FilePlayStrLines;
 int FilePlayDataCount = 0;
 
+
+String ArtNetIPDefault = "127.0.0.1"; //used as the default, in case an IP address was not properly listed in matrix-output.ini
+
 //=================================================================================================================================
 
 //DECLARE A SPOUT OBJECT
 Spout[] spoutReciever;
 Spout spoutSenderMixed, spoutSenderA, spoutSenderB;
+
+ArtNetClient artnetServer;
 
 Serial serialPort, externalSerialPort;  
 
@@ -670,15 +695,17 @@ void settings()
 
 
 void setup() {
-
-  hint(DISABLE_OPTIMIZED_STROKE); //without this P3D renderer will draw all strokes last, so they overlay all other drawing
+  //without this P3D renderer will draw all strokes last, so they overlay all other drawing
+  hint(DISABLE_OPTIMIZED_STROKE); //Significantly slows down the GUI
+  
   surface.setResizable(true);   // Needed for resizing the window to the sender size
   surface.setLocation(100, 100);
   surface.setTitle("NLED AllPixMatrix - Northern Lights Electronic Design, LLC");
 
   colorMode(RGB);
-  frameRate(1000); //set to 1000, to make draw run every 1 millisecond
+  frameRate(cGUIRefreshFPS); //set to any default, only affects the GUI, does not affect media or output rates
 
+  
   font = createFont("Arial-BoldMT", 48);
   generatedFont = loadFont("Arial-BoldMT-48.vlw"); //for use with the text generated media, edit with your own if you want
   textFont(font);
@@ -691,7 +718,7 @@ void setup() {
   //was not able to get patch changes working mid program, restart software if you need to change the patch file for now
   //have to resize all the image buffers (LayerContentGBufA, scratchImg etc) but that will cause crashes since it will be accessed by threads before fully updated
 
-    matrix = new MatrixObj(); 
+  matrix = new MatrixObj(); 
   LoadConfigurationFiles(); //Load all configuration files , patch files, and the rest - does not load media content files
 
   matrix.loadPatchFile();
@@ -787,7 +814,7 @@ void setup() {
 
   //---------------------------------------- END LAYER Elements ---------------------------------------
 
-  mainCrossFader = new guiSliderBar(543, 280, 250, 40, 50, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, false, false, true, "mainCrossFaderFunc"); 
+  mainCrossFader = new guiSliderBar(543, 280, 250, 40, 0, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, false, false, true, "mainCrossFaderFunc"); 
   mainIntensityFader = new guiSliderBar(543, 380, 250, 20, 100, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, false, false, true, "mainIntensityFunc"); 
   mainIntensityFader.setValue(int(mainIntensityFader.max*MasterIntensity));
   intensitySliderA  = new guiSliderBar(340, 310, 25, 220, 0, 0, 100, color(255), color(0), color(255, 0, 0), color(0), true, true, true, true, "feedIntensityFuncA"); 
@@ -1036,11 +1063,11 @@ void setup() {
   OpenOverlayMenu(cOverlayMainMenu, 0); //will do this instead, user can load it at software startup
   //still will get a handuful of java.lang.NullPointerException errors, but can be ignored
   
-  
   MainMixFunction(); //update right away to prevent errors
 
   println("Window scale is: "+SF);
   thread("OutputTransmissionThread"); //START TRANSMISSION THREAD
+  thread("MainMixingThread"); //updates the media that is assigned to the layers
 } //end setup()
 
 //===============================================================================================================================

@@ -172,8 +172,8 @@ void LoadConfigurationFiles()
   workString = split(strLines[4], '\t'); //get AUTOMATICFILE boolean
   matrix.automaticFileName = workString[1];
 
-//not sure if this is a good way, but have to utilize relative paths for ease of use, but absolute for expanded usage
-/*
+  //Not sure if this is a good way, but have to utilize relative paths for ease of use, but absolute for expanded usage
+  /*
   if(matrix.footagePath.equals("LOCAL")) 
   {
   println("SET LOCAL ACTIVE");
@@ -194,10 +194,15 @@ void LoadConfigurationFiles()
 
   workString = split(strLines[0], '\t'); //get OUTPUTTYPE integer
   matrix.transmissionType = int(workString[1]);
-
-  workString = split(strLines[1], '\t'); //get OUTPUTPORT integer
-  matrix.serialPort = int(workString[1]);
-
+  
+  workString = split(strLines[1], '\t'); //get OUTPUTPORT integer - saves serial port number or artnet IP address
+  if(matrix.transmissionType == 3) //check if artnet
+  {
+	matrix.outputNetworkIPAdr = workString[1];
+	if(matrix.outputNetworkIPAdr.length() < 7) matrix.outputNetworkIPAdr = ArtNetIPDefault; //string read is not long enough to be an IP, set to default
+  }
+  else matrix.serialPortNum = int(workString[1]);
+  
   workString = split(strLines[2], '\t'); //get OUTPUTBAUD integer
   matrix.serialBaud = int(workString[1]);
 
