@@ -62,6 +62,15 @@ NLED Patcher for creating matrix patch files - https://www.nledshop.com/nledpatc
 
  ======================================================================================================================================
  
+ Changes v.1a to v.1b:
+	- Added Artnet output support, ID#3, use the OUTPUTPORT line on matrix-output.ini to set the IP address
+	- Overhauled the the application timing. No longer uses frameRate(1000) for timing
+		- Threads off the media updating, layer mixing, and final mixing. - Creates a few issues
+			- The mixing function's color min/max causes graphical GUI glitches and CPU usage has increased
+		- Now output transmission packet rate is a lot tighter and regular.
+	- Fixed the display "Output Rate(mS)" as it was showing incorrect time
+	- Numerous variable optimizations
+ 
 Changes BETA 0.99 to v.1a
 	- numerous GUI fixes
 	- Star fieild 'twinkle' changed to z-distance
@@ -72,6 +81,7 @@ Changes BETA 0.99 to v.1a
 	- Fixed issues with re-loading config files during application runtime
 	- Renamed numerous variables and objects with more refined naming schemes
 	- Added option to record to file for string or binary/raw formated files
+	
 	
 ======================================================================================================================================
 
